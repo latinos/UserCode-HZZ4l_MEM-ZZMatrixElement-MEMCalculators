@@ -140,19 +140,27 @@ private:
     /// internal enums for supported return values/errors
     enum ERRCodes    {NO_ERR, ERR_PROCESS, ERR_COMPUTE, NUM_ERRORS};
     
+    /// cache MELA calculiation from old interface
+    void cacheMELAcalculation(vector<TLorentzVector> partP, vector<int> partId);
+
+    // caches to avoid multiplemela compuations
+  std::vector<TLorentzVector> partPCache;
+  std::vector<int> partIdCache;
 };
+
 
 /// Matrix of supproted processes - initialisation (to be updated)
 const bool MEMs::isProcSupported[NUM_PROCESSES][NUM_MEMCALCS] = {// kAnalytical   kMEKD       kJHUGen     kMCFM       kMELA_HCP
-                                                                             {0,            1,          0,          0,          0},      // kSMHiggs
-                                                                             {0,            0,          0,          0,          0},      // k0hplus
-                                                                             {0,            1,          0,          0,          0},      // k0minus
-                                                                             {0,            0,          0,          0,          0},      // k1plus
-                                                                             {0,            0,          0,          0,          0},      // k1minus
-                                                                             {0,            1,          0,          0,          0},      // k2mplus_gg
-                                                                             {0,            0,          0,          0,          0},      // k2mplus_qqbar
-                                                                             {0,            1,          0,          0,          0},      // kqqZZ
-                                                                             {0,            0,          0,          0,          0}};     // kggZZ
+    {1,            1,          1,          1,          0},      // kSMHiggs
+    {0,            0,          0,          0,          0},      // k0hplus
+    {1,            1,          1,          0,          0},      // k0minus
+    {0,            0,          0,          0,          0},      // k1plus
+    {0,            0,          0,          0,          0},      // k1minus
+    {1,            1,          1,          0,          0},      // k2mplus_gg
+    {0,            0,          0,          0,          0},      // k2mplus_qqbar
+    {1,            1,          1,          0,          0},      // kqqZZ
+    {0,            0,          1,          0,          0}};     // kggZZ
+
 
 /// MEKD process name translation - initialisation (to be updated)
 const TString MEMs::m_processNameMEKD[NUM_PROCESSES] = {"SMHiggs", "Higgs0P", "Higgs0M", "", "", "Graviton2PM", "", "ZZ", ""};

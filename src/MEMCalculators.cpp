@@ -8,6 +8,7 @@
 
 /// MEMs header
 #include "../interface/MEMCalculators.h"
+#include "ZZMatrixElement/MELA/src/computeAngles.h"
 
 using namespace std;
 
@@ -47,17 +48,21 @@ int MEMs::computeME(Processes process, MEMCalcs calculator, vector<TLorentzVecto
     
     /// perform computation according to the specified process and MEM package
     switch ( calculator ) {
-        case kMEKD:         /// compute ME with MEKD
-            if( (m_MEKD->computeME(m_processNameMEKD[process], partP, partId, me2process)) != 0 ) return ERR_COMPUTE;
-            break;
-        case kAnalytical:   /// compute ME with MELA
-        case kJHUGen:       /// compute ME with JHUGen
-        case kMCFM:         /// compute ME with MCFM
-            // ...
-            break;
-        default:
-            return ERR_PROCESS;
-            break;
+    case kMEKD:         /// compute ME with MEKD
+      if( (m_MEKD->computeME(m_processNameMEKD[process], partP, partId, me2process)) != 0 ) return ERR_COMPUTE;
+      break;
+    case kAnalytical:  	  /// compute ME with MELA
+      cacheMELAcalculation(partP,partId); 
+      break;
+    case kJHUGen:       /// compute ME with JHUGen
+      cacheMELAcalculation(partP,partId); 
+      break;	  
+    case kMCFM:         /// compute ME with MCFM
+      cacheMELAcalculation(partP,partId); 
+      break;	  
+    default:
+      return ERR_PROCESS;
+      break;
     }
     
     return NO_ERR;
@@ -156,5 +161,103 @@ double MEMs::probRatio(double me2processA, double me2processB){
 }
 
 //////////////////////////////////////////////////////////////////////////
+///----------------------------------------------------------------------------------------------
+/// MEMCalculators::cacheMELAcalculation - method to interface with Mela::computeP and cache results
+///----------------------------------------------------------------------------------------------
+void  MEMs::cacheMELAcalculation(vector<TLorentzVector> partP, vector<int> partId){
+
+  if( partPCache==partP &&  partIdCache==partId) // do nothing if we have already processed these
+    return;
+
+  partPCache = partP;
+  partIdCache = partId;
+
+  // NEED TO INCLUDE SOME PROTECTION SO THAT USER CANT 
+  // PASS FOUR-VECTORS IN WRONG ORDER.  FOR NOW ASSUMING
+  // THEY ARE PASSED AS e-,e+,mu-,mu+
+  // ------------------ channel ------------------------
+  int flavor;
+
+
+  float p0plus_melaNorm,p0plus_mela,p0minus_mela,p0plus_VAJHU,p0minus_VAJHU,p0plus_VAMCFM,p1_mela,p1_VAJHU,p2_mela,p2_VAJHU; // new signal probablities
+  float bkg_mela, bkg_VAMCFM,ggzz_VAMCFM,bkg_VAMCFMNorm;                                           // new background probabilities
+  float p0_pt,p0_y,bkg_pt,bkg_y;                        // rapidity/pt
+  float p0plus_m4l,bkg_m4l; //supermela
+  
+
+  if(abs(partId[0])==abs(partId[1])&&
+     abs(partId[0])==abs(partId[2])&&
+     abs(partId[0])==abs(partId[3])){
+
+    if(abs(partId[0])==11) flavor=1;
+    else flavor=2;
+
+  }else flavor=3;
+
+  // ---------------------------------------------------
+  // ---------- COMPUTE ANGLES and MASSES --------------
+  float costheta1, costheta2, costhetastar;
+  float phi, phi1;
+
+  mela::computeAngles(partP[0], partId[0], partP[1], partId[1], 
+		      partP[2], partId[2], partP[3], partId[3],
+		      costhetastar,costheta1,costheta2,phi,phi1);
+
+  float m1=(partP[0] + partP[1]).M();
+  float m2=(partP[2] + partP[3]).M();
+
+  TLorentzVector ZZ = (partP[0] + partP[1] + partP[2] + partP[3]);
+  float mzz = ZZ.M();
+
+  float pt4l  = ZZ.Pt();
+  float Y4l   = ZZ.Rapidity(); // Fixme: should probably protect against NaN?
+  // ---------------------------------------------------
+  m_MELA->computeP(mzz, m1, m2,
+		  costhetastar,costheta1,costheta2,phi,phi1,
+		  //signal probabilities
+		  p0plus_melaNorm,   // higgs, analytic distribution, normalized
+		  p0plus_mela,   // higgs, analytic distribution
+		  p0minus_mela,  // pseudoscalar, analytic distribution
+		  p0plus_VAJHU,  // higgs, vector algebra, JHUgen
+		  p0minus_VAJHU, // pseudoscalar, vector algebra, JHUgen
+		  p0plus_VAMCFM,// higgs, vector algebra, MCFM
+		  p1_mela,  // zprime, analytic distribution
+		  p1_VAJHU, // zprime, vector algebra, JHUgen,
+		  p2_mela , // graviton, analytic distribution
+		  p2_VAJHU, // graviton, vector algebra, JHUgen,
+		  //backgrounds
+		  bkg_mela,  // background,  analytic distribution
+		  bkg_VAMCFM, // background, vector algebra, MCFM
+		  ggzz_VAMCFM, // background, vector algebra, MCFM for ggzz
+		  bkg_VAMCFMNorm, // background, vector algebra, MCFM
+		  //pt/rapidity
+		  p0_pt, // multiplicative probability for signal pt
+		  p0_y, // multiplicative probability for signal y
+		  bkg_pt, // multiplicative probability for bkg pt
+		  bkg_y, // multiplicative probability for bkg y
+		  // supermela
+		  p0plus_m4l,  // signal m4l probability as in datacards
+		  bkg_m4l,     // backgroun m4l probability as in datacards
+		  //optional input parameters
+		  pt4l,Y4l,flavor // 1:4e, 2:4mu, 3:2e2mu (for interference effects)
+		  );
+
+  m_computedME[kSMHiggs][kAnalytical]   = p0plus_melaNorm;
+  m_computedME[k0minus][kAnalytical]    = p0minus_mela;
+  
+  m_computedME[kSMHiggs][kJHUGen]       = p0plus_VAJHU;
+  m_computedME[k0minus][kJHUGen]        = p0minus_VAJHU;
+
+  m_computedME[kSMHiggs][kMCFM]         = p0plus_VAMCFM;
+
+  m_computedME[k2mplus_gg][kAnalytical] = p2_mela;
+  m_computedME[k2mplus_gg][kJHUGen]     = p2_VAJHU;
+
+  m_computedME[kqqZZ][kAnalytical]      = bkg_mela;
+  m_computedME[kqqZZ][kMCFM]            = bkg_VAMCFMNorm;
+  m_computedME[kggZZ][kMCFM]            = ggzz_VAMCFM;
+
+
+}  
 
 #endif
