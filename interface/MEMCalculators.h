@@ -22,10 +22,11 @@
 #include "TLorentzVector.h"
 
 // MELA
-#include "ZZMatrixElement/MELA/interface/Mela.h"
+//#include "ZZMatrixElement/MELA/interface/Mela.h"
+class Mela;
 // MEKD
-#include "ZZMatrixElement/MEKD/interface/MEKD.h"
-
+//#include "ZZMatrixElement/MEKD/interface/MEKD.h"
+class MEKD;
 
 //////////////////////////////////////////////////////////////////////////
 ///  MEMs interface class to MELA & MEKD packages.
@@ -46,7 +47,7 @@ public:
     /// \param collisionEnergy              the sqrt(s) value in TeV (DEFAULT = 8).
 	/// \param PDFName                      the name of the parton density functions to be used (DEFAULT = "", Optional: "CTEQ6L").
     ///
-    MEMs(double collisionEnergy = 8, string PDFName = "");
+    MEMs(double collisionEnergy = 8, string PDFName = "", bool debug_=false);
 
     /// Enum type for supported processes in MELA and MEKD packages
     enum Processes    {kSMHiggs, k0hplus, k0minus, k1plus, k1minus, k2mplus_gg, k2mplus_qqbar, kqqZZ, kggZZ, NUM_PROCESSES};
@@ -131,6 +132,9 @@ private:
     MEKD* m_MEKD;
     Mela* m_MELA;
 
+    // debug flag
+    bool debug;
+
     /// MEKD process name translation
     static const TString m_processNameMEKD[NUM_PROCESSES];
 
@@ -150,20 +154,21 @@ private:
 
 
 /// Matrix of supproted processes - initialisation (to be updated)
-const bool MEMs::isProcSupported[NUM_PROCESSES][NUM_MEMCALCS] = {// kAnalytical   kMEKD       kJHUGen     kMCFM       kMELA_HCP
-    {1,            1,          1,          1,          0},      // kSMHiggs
-    {0,            0,          0,          0,          0},      // k0hplus
-    {1,            1,          1,          0,          0},      // k0minus
-    {0,            0,          0,          0,          0},      // k1plus
-    {0,            0,          0,          0,          0},      // k1minus
-    {1,            1,          1,          0,          0},      // k2mplus_gg
-    {0,            0,          0,          0,          0},      // k2mplus_qqbar
-    {1,            1,          1,          0,          0},      // kqqZZ
-    {0,            0,          1,          0,          0}};     // kggZZ
+const bool MEMs::isProcSupported[MEMs::NUM_PROCESSES][MEMs::NUM_MEMCALCS] = {
+// kAnalytical   kMEKD       kJHUGen     kMCFM       kMELA_HCP
+  {1,            1,          1,          1,          0},      // kSMHiggs
+  {1,            0,          1,          0,          0},      // k0hplus
+  {1,            1,          1,          0,          0},      // k0minus
+  {0,            0,          1,          0,          0},      // k1plus
+  {1,            0,          1,          0,          0},      // k1minus
+  {1,            1,          1,          0,          0},      // k2mplus_gg
+  {0,            0,          1,          0,          0},      // k2mplus_qqbar
+  {1,            1,          0,          1,          0},      // kqqZZ
+  {0,            0,          0,          1,          0}};     // kggZZ
 
 
 /// MEKD process name translation - initialisation (to be updated)
-const TString MEMs::m_processNameMEKD[NUM_PROCESSES] = {"SMHiggs", "Higgs0P", "Higgs0M", "", "", "Graviton2PM", "", "ZZ", ""};
+const TString MEMs::m_processNameMEKD[MEMs::NUM_PROCESSES] = {"SMHiggs", "Higgs0P", "Higgs0M", "", "", "Graviton2PM", "", "ZZ", ""};
 
 //////////////////////////////////////////////////////////////////////////
 
