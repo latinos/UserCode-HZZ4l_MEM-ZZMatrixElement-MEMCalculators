@@ -156,14 +156,14 @@ private:
 /// Matrix of supproted processes - initialisation (to be updated)
 const bool MEMs::isProcSupported[MEMs::NUM_PROCESSES][MEMs::NUM_MEMCALCS] = {
 // kAnalytical   kMEKD       kJHUGen     kMCFM       kMELA_HCP
-  {1,            1,          1,          1,          0},      // kSMHiggs
+  {1,            1,          1,          1,          1},      // kSMHiggs
   {1,            0,          1,          0,          0},      // k0hplus
   {1,            1,          1,          0,          0},      // k0minus
-  {0,            0,          1,          0,          0},      // k1plus
+  {1,            0,          1,          0,          0},      // k1plus
   {1,            0,          1,          0,          0},      // k1minus
   {1,            1,          1,          0,          0},      // k2mplus_gg
-  {0,            0,          1,          0,          0},      // k2mplus_qqbar
-  {1,            1,          0,          1,          0},      // kqqZZ
+  {1,            0,          1,          0,          0},      // k2mplus_qqbar
+  {1,            1,          0,          1,          1},      // kqqZZ
   {0,            0,          0,          1,          0}};     // kggZZ
 
 

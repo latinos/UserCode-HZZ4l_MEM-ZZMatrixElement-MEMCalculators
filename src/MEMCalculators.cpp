@@ -193,11 +193,13 @@ void  MEMs::cacheMELAcalculation(vector<TLorentzVector> partP, vector<int> partI
   if(debug)
     std::cout << "initializing variables" << std::endl;
 
-  float p0plus_melaNorm,p0plus_mela,p0minus_mela; // analytical spin0 
+  float p0plus_melaNorm,p0plus_mela,p0minus_mela,p0hplus_mela; // analytical spin0 
+  float p1_mela,p1plus_mela; // analytical spin1
+  float p2_mela,p2qqb_mela; // analytical spin2
   float p0plus_VAJHU,p0minus_VAJHU, p0hplus_VAJHU; // JHUGen spin0 
   float p0plus_VAMCFM; // MCFM spin0 
-  float p1_mela,p1_VAJHU, p1plus_VAJHU; // spin1
-  float p2_mela,p2_VAJHU,p2qqb_VAJHU; // spin2
+  float p1_VAJHU, p1plus_VAJHU; // JHUGen spin1
+  float p2_VAJHU,p2qqb_VAJHU; // JHUGen spin2
   float bkg_mela, bkg_VAMCFM,ggzz_VAMCFM,bkg_VAMCFMNorm; // background
   float p0_pt,p0_y,bkg_pt,bkg_y;                        // rapidity/pt
   float p0plus_m4l,bkg_m4l; //supermela
@@ -231,11 +233,7 @@ void  MEMs::cacheMELAcalculation(vector<TLorentzVector> partP, vector<int> partI
   TLorentzVector ZZ = (partP[0] + partP[1] + partP[2] + partP[3]);
   float mzz = ZZ.M();
 
-  // !!!!!!!!!!!!!!!! FIX ME !!!!!!!!!!!!!!!
-  // pT set to 100.0 for testing 
-  // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-  float pt4l  = 100.0; // ZZ.Pt();
+  float pt4l  = ZZ.Pt();
   float Y4l   = ZZ.Rapidity(); // Fixme: should probably protect against NaN?
 
   if(debug){
@@ -251,6 +249,13 @@ void  MEMs::cacheMELAcalculation(vector<TLorentzVector> partP, vector<int> partI
     std::cout << "Y4l: " << Y4l << std::endl;
   }
 
+  if(ZZ.Pt()==0 || ZZ.Rapidity()!=ZZ.Rapidity()){
+    cout << "void  MEMs::cacheMELAcalculation" << endl;
+    cout << "pt4l: " << ZZ.Pt() << endl;
+    cout << "Y4l:  " << ZZ.Rapidity() << endl;
+    //return;
+  }
+
   // ---------------------------------------------------
   m_MELA->computeP(mzz, m1, m2,
 		   costhetastar,costheta1,costheta2,phi,phi1,
@@ -258,14 +263,17 @@ void  MEMs::cacheMELAcalculation(vector<TLorentzVector> partP, vector<int> partI
 		   p0plus_melaNorm,   // higgs, analytic distribution, normalized
 		   p0plus_mela,   // higgs, analytic distribution
 		   p0minus_mela,  // pseudoscalar, analytic distribution
+		   p0hplus_mela,  // pseudoscalar, analytic distribution
 		   p0plus_VAJHU,  // higgs, vector algebra, JHUgen
 		   p0minus_VAJHU, // pseudoscalar, vector algebra, JHUgen
 		   p0plus_VAMCFM,// higgs, vector algebra, MCFM
 		   p0hplus_VAJHU, // 0h+ (high dimensional operator), vector algebra, JHUgen
 		   p1_mela,  // zprime, analytic distribution
+		   p1plus_mela,  // zprime, analytic distribution
 		   p1_VAJHU, // zprime, vector algebra, JHUgen,
 		   p1plus_VAJHU, // 1+ (axial vector), vector algebra, JHUgen,
 		   p2_mela , // graviton, analytic distribution
+		   p2qqb_mela , // graviton, analytic distribution
 		   p2_VAJHU, // graviton, vector algebra, JHUgen,
 		   p2qqb_VAJHU, // graviton produced by qqbar, vector algebra, JHUgen,
 		   //backgrounds
@@ -288,10 +296,14 @@ void  MEMs::cacheMELAcalculation(vector<TLorentzVector> partP, vector<int> partI
   if(debug)
     std::cout << "got MEs" << std::endl;
 
-  m_computedME[kSMHiggs][kAnalytical]   = p0plus_melaNorm;
-  m_computedME[k0minus][kAnalytical]    = p0minus_mela;
-  m_computedME[k2mplus_gg][kAnalytical] = p2_mela;
-  m_computedME[kqqZZ][kAnalytical]      = bkg_mela;
+  m_computedME[kSMHiggs][kAnalytical]      = p0plus_melaNorm;
+  m_computedME[k0minus][kAnalytical]       = p0minus_mela;
+  m_computedME[k0hplus][kAnalytical]       = p0hplus_mela;
+  m_computedME[k1minus][kAnalytical]       = p1_VAJHU;
+  m_computedME[k1plus][kAnalytical]        = p1plus_VAJHU;
+  m_computedME[k2mplus_gg][kAnalytical]    = p2_mela;
+  m_computedME[k2mplus_qqbar][kAnalytical] = p2qqb_mela;
+  m_computedME[kqqZZ][kAnalytical]         = bkg_mela;
   
   m_computedME[kSMHiggs][kJHUGen]       = p0plus_VAJHU;
   m_computedME[k0minus][kJHUGen]        = p0minus_VAJHU;
@@ -304,6 +316,9 @@ void  MEMs::cacheMELAcalculation(vector<TLorentzVector> partP, vector<int> partI
   m_computedME[kSMHiggs][kMCFM]         = p0plus_VAMCFM;
   m_computedME[kqqZZ][kMCFM]            = bkg_VAMCFMNorm;
   m_computedME[kggZZ][kMCFM]            = ggzz_VAMCFM;
+
+  m_computedME[kSMHiggs][kMELA_HCP]         = p0plus_melaNorm;
+  m_computedME[kqqZZ][kMELA_HCP]            = bkg_mela;
 
   if(debug)
     std::cout << "Done!" << std::endl;
