@@ -272,23 +272,23 @@ void  MEMs::cacheMELAcalculation(vector<TLorentzVector> partP, vector<int> partI
 		   p1plus_mela,  // zprime, analytic distribution
 		   p1_VAJHU, // zprime, vector algebra, JHUgen,
 		   p1plus_VAJHU, // 1+ (axial vector), vector algebra, JHUgen,
-		   p2_mela , // graviton, analytic distribution
-		   p2qqb_mela , // graviton, analytic distribution
+		   p2_mela , // graviton, analytic distribution,
+		   p2qqb_mela , // graviton, analytic distribution,
 		   p2_VAJHU, // graviton, vector algebra, JHUgen,
 		   p2qqb_VAJHU, // graviton produced by qqbar, vector algebra, JHUgen,
 		   //backgrounds
-		   bkg_mela,  // background,  analytic distribution
-		   bkg_VAMCFM, // background, vector algebra, MCFM
-		   ggzz_VAMCFM, // background, vector algebra, MCFM for ggzz
-		   bkg_VAMCFMNorm, // background, vector algebra, MCFM
+		   bkg_mela,  // background,  analytic distribution,
+		   bkg_VAMCFM, // background, vector algebra, MCFM,
+		   ggzz_VAMCFM, // background, vector algebra, MCFM for ggzz,
+		   bkg_VAMCFMNorm, // background, vector algebra, MCFM,
 		   //pt/rapidity
-		   p0_pt, // multiplicative probability for signal pt
-		   p0_y, // multiplicative probability for signal y
-		   bkg_pt, // multiplicative probability for bkg pt
-		   bkg_y, // multiplicative probability for bkg y
+		   p0_pt, // multiplicative probability for signal pt,
+		   p0_y, // multiplicative probability for signal y,
+		   bkg_pt, // multiplicative probability for bkg pt,
+		   bkg_y, // multiplicative probability for bkg y,
 		   // supermela
-		   p0plus_m4l,  // signal m4l probability as in datacards
-		   bkg_m4l,     // backgroun m4l probability as in datacards
+		   p0plus_m4l,  // signal m4l probability as in datacards,
+		   bkg_m4l,     // backgroun m4l probability as in datacards,
 		   //optional input parameters
 		   pt4l,Y4l,flavor // 1:4e, 2:4mu, 3:2e2mu (for interference effects)
 		   );
@@ -314,7 +314,7 @@ void  MEMs::cacheMELAcalculation(vector<TLorentzVector> partP, vector<int> partI
   m_computedME[k2mplus_qqbar][kJHUGen]  = p2qqb_VAJHU;
 
   m_computedME[kSMHiggs][kMCFM]         = p0plus_VAMCFM;
-  m_computedME[kqqZZ][kMCFM]            = bkg_VAMCFMNorm;
+  m_computedME[kqqZZ][kMCFM]            = bkg_VAMCFM;
   m_computedME[kggZZ][kMCFM]            = ggzz_VAMCFM;
 
   m_computedME[kSMHiggs][kMELA_HCP]         = p0plus_melaNorm;

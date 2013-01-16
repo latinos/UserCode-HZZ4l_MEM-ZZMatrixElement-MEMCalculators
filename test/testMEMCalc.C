@@ -12,9 +12,9 @@ vector<TLorentzVector> Calculate4Momentum(double Mx,double M1,double M2,double t
 void testMEMCalc(){
 
   TChain* t = new TChain("SelectedTree");
-  t->Add("HZZ4lTree_H500_withProbabilities_4mu.root");
+  t->Add("HZZ4lTree_jhuPseH125_withProbabilities_4e.root");
   
-  TString fileName = "HZZ4lTree_H500_withProbabilities_4mu.root";
+  TString fileName = "HZZ4lTree_jhuPseH125_withProbabilities_4e.root";
   fileName.ReplaceAll(".root","_test.root");
   TFile* file = new TFile(fileName,"RECREATE");
 
@@ -30,7 +30,7 @@ void testMEMCalc(){
   double p0hplus_VAJHU_test,p1plus_VAJHU_test;
   double p0minus_VAJHU_test,p1_VAJHU_test;
 
-  double qqZZ_VAMCFM_test,ggZZ_VAMCFM_test;
+  double qqZZ_VAMCFM_test,ggZZ_VAMCFM_test,p0plus_VAMCFM_test;
 
   // new branches
   tree->Branch("p0plus_mela_test",&p0plus_mela_test,"p0plus_mela_test/D");
@@ -39,8 +39,9 @@ void testMEMCalc(){
   tree->Branch("p1_mela_test",&p1_mela_test,"p1_mela_test/D");
   tree->Branch("p1plus_mela_test",&p1plus_mela_test,"p1plus_mela_test/D");
   tree->Branch("p2_mela_test",&p2_mela_test,"p2_mela_test/D");
-   tree->Branch("p2qqb_mela_test",&p2qqb_mela_test,"p2qqb_mela_test/D");
+  tree->Branch("p2qqb_mela_test",&p2qqb_mela_test,"p2qqb_mela_test/D");
 
+  tree->Branch("p0plus_VAMCFM_test",&p0plus_VAMCFM_test,"p0plus_VAMCFM_test/D");
   tree->Branch("qqZZ_VAMCFM_test",&qqZZ_VAMCFM_test,"qqZZ_VAMCFM_test/D");
   tree->Branch("ggZZ_VAMCFM_test",&ggZZ_VAMCFM_test,"ggZZ_VAMCFM_test/D");
 
@@ -86,9 +87,11 @@ void testMEMCalc(){
     test.computeME(test.k0minus,test.kAnalytical,p4,id,p0minus_mela_test);
     test.computeME(test.k1minus,test.kAnalytical,p4,id,p1_mela_test);
     test.computeME(test.k1plus,test.kAnalytical,p4,id,p1plus_mela_test);
-    test.computeME(test.k2mplus_gg,test.kAnalytical,p4,id,p2qqb_mela_test);
-
+    test.computeME(test.k2mplus_gg,test.kAnalytical,p4,id,p2_mela_test);
+    test.computeME(test.k2mplus_qqbar,test.kAnalytical,p4,id,p2qqb_mela_test);
+   
     test.computeME(test.kggZZ,test.kMCFM,p4,id,ggZZ_VAMCFM_test);
+    test.computeME(test.kSMHiggs,test.kMCFM,p4,id,p0plus_VAMCFM_test);
     test.computeME(test.kqqZZ,test.kMCFM,p4,id,qqZZ_VAMCFM_test);
 
     test.computeME(test.kSMHiggs,test.kJHUGen,p4,id,p0plus_VAJHU_test);
@@ -97,6 +100,7 @@ void testMEMCalc(){
     test.computeME(test.k1minus,test.kJHUGen,p4,id,p1_VAJHU_test);
     test.computeME(test.k1plus,test.kJHUGen,p4,id,p1plus_VAJHU_test);
     test.computeME(test.k2mplus_gg,test.kJHUGen,p4,id,p2_VAJHU_test);
+    test.computeME(test.k2mplus_qqbar,test.kJHUGen,p4,id,p2qqb_VAJHU_test);
 
     tree->Fill();
 
