@@ -23,6 +23,7 @@ void testMEMCalc(){
   MEMs test(8,"",false);
 
   double p0plus_mela_test,p2_mela_test,p2qqb_mela_test;
+  double bkg_mela_test,p0plus_melaNorm_test;
   double p0hplus_mela_test,p1plus_mela_test;
   double p0minus_mela_test,p1_mela_test;
 
@@ -40,6 +41,9 @@ void testMEMCalc(){
   tree->Branch("p1plus_mela_test",&p1plus_mela_test,"p1plus_mela_test/D");
   tree->Branch("p2_mela_test",&p2_mela_test,"p2_mela_test/D");
   tree->Branch("p2qqb_mela_test",&p2qqb_mela_test,"p2qqb_mela_test/D");
+
+  tree->Branch("p0plus_melaNorm_test",&p0plus_melaNorm_test,"p0plus_melaNorm_test/D");
+  tree->Branch("bkg_mela_test",&bkg_mela_test,"bkg_mela_test/D");
 
   tree->Branch("p0plus_VAMCFM_test",&p0plus_VAMCFM_test,"p0plus_VAMCFM_test/D");
   tree->Branch("qqZZ_VAMCFM_test",&qqZZ_VAMCFM_test,"qqZZ_VAMCFM_test/D");
@@ -75,7 +79,7 @@ void testMEMCalc(){
   id.push_back(11);
   id.push_back(-11);  
 
-  for(int i=0 ; i<t->GetEntries(); i++){
+  for(int i=0 ; i<10/*t->GetEntries()*/; i++){
 
     t->GetEntry(i);
     t->Show(i);
@@ -83,6 +87,8 @@ void testMEMCalc(){
     p4 = Calculate4Momentum(mzz,m1,m2,acos(hs),acos(h1),acos(h2),phi1,phi,pt4l,Y4l);
     
     test.computeME(test.kSMHiggs,test.kAnalytical,p4,id,p0plus_mela_test);
+    test.computeME(test.kSMHiggs,test.kMELA_HCP,p4,id,p0plus_melaNorm_test);
+test.computeME(test.kqqZZ,test.kMELA_HCP,p4,id,bkg_mela_test);
     test.computeME(test.k0hplus,test.kAnalytical,p4,id,p0hplus_mela_test);
     test.computeME(test.k0minus,test.kAnalytical,p4,id,p0minus_mela_test);
     test.computeME(test.k1minus,test.kAnalytical,p4,id,p1_mela_test);
