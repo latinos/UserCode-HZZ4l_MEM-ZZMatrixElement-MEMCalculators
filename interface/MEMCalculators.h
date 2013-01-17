@@ -28,16 +28,30 @@ class Mela;
 //#include "ZZMatrixElement/MEKD/interface/MEKD.h"
 class MEKD;
 
-//////////////////////////////////////////////////////////////////////////
-///  MEMs interface class to MELA & MEKD packages.
-///
-///  Provides interface to the MEKD & MELA packages to
-///  computes MEs and KDs for the process specified by the user.
-///
-//////////////////////////////////////////////////////////////////////////
-
 using namespace std;
 
+//////////////////////////////////////////////////////////////////////////
+///
+///  MEMNames namespace provides enum types for names of processes and
+///  names of tools/calculators supported by MELA and MEKD packages.
+///
+//////////////////////////////////////////////////////////////////////////
+namespace MEMNames {
+    /// Enum type for supported processes in MELA and MEKD packages
+    enum Processes    {kSMHiggs, k0hplus, k0minus, k1plus, k1minus, k2mplus_gg, k2mplus_qqbar, kqqZZ, kggZZ, NUM_PROCESSES};
+    
+    /// Enum type for supported MEM calculators from MELA and MEKD packages
+    enum MEMCalcs    {kAnalytical, kMEKD, kJHUGen, kMCFM, kMELA_HCP, NUM_MEMCALCS};
+}
+
+//////////////////////////////////////////////////////////////////////////
+///
+///  MEMs class provides an interface to the MEKD & MELA packages necessary
+///  to computes LO Matrix Elements (MEs) and Kinematic Discriminants (KDs)
+///  for the processes and by tools specified by the user.
+///
+//////////////////////////////////////////////////////////////////////////
+using namespace MEMNames;
 
 class MEMs {
 public:
@@ -48,12 +62,6 @@ public:
 	/// \param PDFName                      the name of the parton density functions to be used (DEFAULT = "", Optional: "CTEQ6L").
     ///
     MEMs(double collisionEnergy = 8, string PDFName = "", bool debug_=false);
-
-    /// Enum type for supported processes in MELA and MEKD packages
-    enum Processes    {kSMHiggs, k0hplus, k0minus, k1plus, k1minus, k2mplus_gg, k2mplus_qqbar, kqqZZ, kggZZ, NUM_PROCESSES};
-
-    /// Enum type for supported MEM calculators from MELA and MEKD packages
-    enum MEMCalcs    {kAnalytical, kMEKD, kJHUGen, kMCFM, kMELA_HCP, NUM_MEMCALCS};
     
     ///
     /// Compute individual ME for the specified process.
@@ -154,10 +162,10 @@ private:
 
 
 /// Matrix of supproted processes - initialisation (to be updated)
-const bool MEMs::isProcSupported[MEMs::NUM_PROCESSES][MEMs::NUM_MEMCALCS] = {
+const bool MEMs::isProcSupported[MEMNames::NUM_PROCESSES][MEMNames::NUM_MEMCALCS] = {
 // kAnalytical   kMEKD       kJHUGen     kMCFM       kMELA_HCP
   {1,            1,          1,          1,          1},      // kSMHiggs
-  {1,            0,          1,          0,          0},      // k0hplus
+  {1,            1,          1,          0,          0},      // k0hplus
   {1,            1,          1,          0,          0},      // k0minus
   {1,            0,          1,          0,          0},      // k1plus
   {1,            0,          1,          0,          0},      // k1minus
@@ -168,7 +176,7 @@ const bool MEMs::isProcSupported[MEMs::NUM_PROCESSES][MEMs::NUM_MEMCALCS] = {
 
 
 /// MEKD process name translation - initialisation (to be updated)
-const TString MEMs::m_processNameMEKD[MEMs::NUM_PROCESSES] = {"SMHiggs", "Higgs0P", "Higgs0M", "", "", "Graviton2PM", "", "ZZ", ""};
+const TString MEMs::m_processNameMEKD[MEMNames::NUM_PROCESSES] = {"SMHiggs", "Higgs0PH", "Higgs0M", "", "", "Graviton2PM", "", "ZZ", ""};
 
 //////////////////////////////////////////////////////////////////////////
 

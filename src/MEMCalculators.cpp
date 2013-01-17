@@ -13,6 +13,7 @@
 #include "ZZMatrixElement/MELA/src/computeAngles.h"
 
 using namespace std;
+using namespace MEMNames;
 
 //////////////////////////////////////////////////////////////////////////
 ///  MEMs interface class to MELA & MEKD packages.
