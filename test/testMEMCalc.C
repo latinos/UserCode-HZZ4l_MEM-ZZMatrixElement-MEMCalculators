@@ -7,6 +7,9 @@
 #include "TTree.h"
 #include <iostream>
 
+using namespace MEMNames;
+using namespace std;
+
 vector<TLorentzVector> Calculate4Momentum(double Mx,double M1,double M2,double theta,double theta1,double theta2,double Phi1,double Phi,double pt4l, double Y4l);
 
 void testMEMCalc(){
@@ -86,27 +89,36 @@ void testMEMCalc(){
 
     p4 = Calculate4Momentum(mzz,m1,m2,acos(hs),acos(h1),acos(h2),phi1,phi,pt4l,Y4l);
     
-    test.computeME(test.kSMHiggs,test.kAnalytical,p4,id,p0plus_mela_test);
-    test.computeME(test.kSMHiggs,test.kMELA_HCP,p4,id,p0plus_melaNorm_test);
-test.computeME(test.kqqZZ,test.kMELA_HCP,p4,id,bkg_mela_test);
-    test.computeME(test.k0hplus,test.kAnalytical,p4,id,p0hplus_mela_test);
-    test.computeME(test.k0minus,test.kAnalytical,p4,id,p0minus_mela_test);
-    test.computeME(test.k1minus,test.kAnalytical,p4,id,p1_mela_test);
-    test.computeME(test.k1plus,test.kAnalytical,p4,id,p1plus_mela_test);
-    test.computeME(test.k2mplus_gg,test.kAnalytical,p4,id,p2_mela_test);
-    test.computeME(test.k2mplus_qqbar,test.kAnalytical,p4,id,p2qqb_mela_test);
-   
-    test.computeME(test.kggZZ,test.kMCFM,p4,id,ggZZ_VAMCFM_test);
-    test.computeME(test.kSMHiggs,test.kMCFM,p4,id,p0plus_VAMCFM_test);
-    test.computeME(test.kqqZZ,test.kMCFM,p4,id,qqZZ_VAMCFM_test);
+    test.computeME(kSMHiggs,kAnalytical,p4,id,p0plus_mela_test);
+    test.computeME(kSMHiggs,kMELA_HCP,p4,id,p0plus_melaNorm_test);
+    test.computeME(kqqZZ,kMELA_HCP,p4,id,bkg_mela_test);
 
-    test.computeME(test.kSMHiggs,test.kJHUGen,p4,id,p0plus_VAJHU_test);
-    test.computeME(test.k0hplus,test.kJHUGen,p4,id,p0hplus_VAJHU_test);
-    test.computeME(test.k0minus,test.kJHUGen,p4,id,p0minus_VAJHU_test);
-    test.computeME(test.k1minus,test.kJHUGen,p4,id,p1_VAJHU_test);
-    test.computeME(test.k1plus,test.kJHUGen,p4,id,p1plus_VAJHU_test);
-    test.computeME(test.k2mplus_gg,test.kJHUGen,p4,id,p2_VAJHU_test);
-    test.computeME(test.k2mplus_qqbar,test.kJHUGen,p4,id,p2qqb_VAJHU_test);
+    test.computeME(k0hplus,kAnalytical,p4,id,p0hplus_mela_test);
+    test.computeME(k0minus,kAnalytical,p4,id,p0minus_mela_test);
+    test.computeME(k1minus,kAnalytical,p4,id,p1_mela_test);
+    test.computeME(k1plus,kAnalytical,p4,id,p1plus_mela_test);
+    test.computeME(k2mplus_gg,kAnalytical,p4,id,p2_mela_test);
+    test.computeME(k2mplus_qqbar,kAnalytical,p4,id,p2qqb_mela_test);
+   
+    test.computeME(kggZZ,kMCFM,p4,id,ggZZ_VAMCFM_test);
+    test.computeME(kSMHiggs,kMCFM,p4,id,p0plus_VAMCFM_test);
+    test.computeME(kqqZZ,kMCFM,p4,id,qqZZ_VAMCFM_test);
+
+    test.computeME(kSMHiggs,kJHUGen,p4,id,p0plus_VAJHU_test);
+    test.computeME(k0hplus,kJHUGen,p4,id,p0hplus_VAJHU_test);
+    test.computeME(k0minus,kJHUGen,p4,id,p0minus_VAJHU_test);
+    test.computeME(k1minus,kJHUGen,p4,id,p1_VAJHU_test);
+    test.computeME(k1plus,kJHUGen,p4,id,p1plus_VAJHU_test);
+    test.computeME(k2mplus_gg,kJHUGen,p4,id,p2_VAJHU_test);
+    test.computeME(k2mplus_qqbar,kJHUGen,p4,id,p2qqb_VAJHU_test);
+
+    double KD,pA,pB;
+    test.computeKD(kSMHiggs,k0minus,kAnalytical,p4,id,KD,pA,pB);
+    cout << "pseudoMELA: " << KD << endl;
+    test.computeKD(kSMHiggs,k2mplus_gg,kAnalytical,p4,id,KD,pA,pB);
+    cout << "graviMELA: " << KD << endl;
+    test.computeKD(kSMHiggs,kqqZZ,kMELA_HCP,p4,id,KD,pA,pB);
+    cout << "MELA: " << KD << endl;
 
     tree->Fill();
 

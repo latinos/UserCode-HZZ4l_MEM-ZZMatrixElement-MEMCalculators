@@ -70,6 +70,10 @@ int MEMs::computeME(Processes process, MEMCalcs calculator, vector<TLorentzVecto
       cacheMELAcalculation(partP,partId); 
       me2process=m_computedME[process][calculator];
       break;	  
+    case kMELA_HCP:
+      cacheMELAcalculation(partP,partId); 
+      me2process=m_computedME[process][calculator];
+      break;
     default:
       return ERR_PROCESS;
       break;
@@ -93,10 +97,29 @@ int MEMs::computeKD(Processes processA, Processes processB, MEMCalcs calculator,
             if( (m_MEKD->computeKD(m_processNameMEKD[processA], m_processNameMEKD[processB], partP, partId, kd, me2processA, me2processB)) != 0 ) return ERR_COMPUTE;
             break;
         case kAnalytical:   /// compute KD with MELA
+          cacheMELAcalculation(partP,partId); 
+          me2processA=m_computedME[processA][calculator];
+          me2processB=m_computedME[processB][calculator];
+	  kd=me2processA/(me2processA+me2processB);
+          break;
         case kJHUGen:       /// compute KD with JHUGen
+          cacheMELAcalculation(partP,partId); 
+          me2processA=m_computedME[processA][calculator];
+          me2processB=m_computedME[processB][calculator];
+	  kd=me2processA/(me2processA+me2processB);
+	  break;
         case kMCFM:         /// compute KD with MCFM
-            // ...
-            break;
+	  cacheMELAcalculation(partP,partId); 
+          me2processA=m_computedME[processA][calculator];
+          me2processB=m_computedME[processB][calculator];
+	  kd=me2processA/(me2processA+me2processB);
+	  break;
+        case kMELA_HCP:         /// compute KD with MCFM
+	  cacheMELAcalculation(partP,partId); 
+          me2processA=m_computedME[processA][calculator];
+          me2processB=m_computedME[processB][calculator];
+	  kd=me2processA/(me2processA+me2processB);
+	  break;
         default:
             return ERR_PROCESS;
             break;
@@ -250,13 +273,6 @@ void  MEMs::cacheMELAcalculation(vector<TLorentzVector> partP, vector<int> partI
     std::cout << "Y4l: " << Y4l << std::endl;
   }
 
-  if(ZZ.Pt()==0 || ZZ.Rapidity()!=ZZ.Rapidity()){
-    cout << "void  MEMs::cacheMELAcalculation" << endl;
-    cout << "pt4l: " << ZZ.Pt() << endl;
-    cout << "Y4l:  " << ZZ.Rapidity() << endl;
-    //return;
-  }
-
   // ---------------------------------------------------
   m_MELA->computeP(mzz, m1, m2,
 		   costhetastar,costheta1,costheta2,phi,phi1,
@@ -297,7 +313,7 @@ void  MEMs::cacheMELAcalculation(vector<TLorentzVector> partP, vector<int> partI
   if(debug)
     std::cout << "got MEs" << std::endl;
 
-  m_computedME[kSMHiggs][kAnalytical]      = p0plus_melaNorm;
+  m_computedME[kSMHiggs][kAnalytical]      = p0plus_mela;
   m_computedME[k0minus][kAnalytical]       = p0minus_mela;
   m_computedME[k0hplus][kAnalytical]       = p0hplus_mela;
   m_computedME[k1minus][kAnalytical]       = p1_VAJHU;
