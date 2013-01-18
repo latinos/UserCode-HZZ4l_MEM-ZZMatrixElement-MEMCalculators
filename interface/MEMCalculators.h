@@ -88,7 +88,26 @@ public:
     /// \return                             error code of the computation: 0 = NO_ERR, 1 = ERR_PROCESS, 2 = ERR_COMPUTE
     ///
     int computeKD(Processes processA, Processes processB, MEMCalcs calculator, vector<TLorentzVector> partP, vector<int> partId, double& kd, double& me2processA, double& me2processB );
+
+
+    /// compute KD as me2processA/(me2processA + c*me2processB)  
+    ///    c will be determined on a case by case basis with 
+    ///    the default as 1.  If case is not found 
+    /// \param[in]  processA (B)    - name of process to be calculated or numerator (denominator) 
+    ///                               (kSMHiggs, k0minus, etc.) (REQUIRED).
+    /// \param[in]  calculatorA (B) - name of calculator to be used for processA (B)
+    ///                            (kAnalytical, kMCFM, kJHUGen, kMEKD, kMELA_HCP) (REQUIRED)
+    /// \param[out] kd              - kinematic discriminant (REQUIRED)
+    /// \param[out] me2processA (B) - result of processA (B) calculation, |ME|^2 (REQUIRED)
+    ///
+    /// \return                     - error code of the computation: 
+    ///                               0 = NO_ERR, 1 = ERR_PROCESS, 2 = ERR_COMPUTE
     
+    int computeKD(Processes processA, MEMCalcs calculatorA, 
+		  Processes processB, MEMCalcs calculatorB,
+		  vector<TLorentzVector> partP, vector<int> partId,
+		  double& kd, double& me2processA, double& me2processB);
+
     ///
     /// Compute MEs for all supported processes.
     ///
@@ -134,6 +153,9 @@ public:
 
     /// Matrix of supproted processes
     static const bool isProcSupported[NUM_PROCESSES][NUM_MEMCALCS];
+
+    /// for calculating JHUGen/MCFM signal vs background KD
+    double qqZZ_MCFMNorm;
 
 private:
     /// MEM calculators: MEKD (Madgraph) and MELA (Analytic, JHUGen, MCFM)

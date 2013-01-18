@@ -127,6 +127,67 @@ int MEMs::computeKD(Processes processA, Processes processB, MEMCalcs calculator,
     return NO_ERR;
 }
 
+/// -------------------------------------------------------
+/// compute KD as me2processA/(me2processA + c*me2processB)
+/// -------------------------------------------------------  
+
+int MEMs::computeKD(Processes processA, MEMCalcs calculatorA, 
+		    Processes processB, MEMCalcs calculatorB,
+		    vector<TLorentzVector> partP, vector<int> partId,
+		    double& kd, double& me2processA, double& me2processB){
+  
+
+    /// check if processes are supported
+    if (!isProcSupported[processA][calculatorA]) return ERR_PROCESS;
+    if (!isProcSupported[processB][calculatorB]) return ERR_PROCESS;
+    
+    /// perform computation according to the specified process and MEM package
+    computeME(processA, calculatorA, partP, partId, me2processA);
+    computeME(processB, calculatorB, partP, partId, me2processB);
+
+    // determine c, if case is not know, c=1.0 and ERR_PROCESS is return
+    // this is not necessarily wrong though. 
+    if( calculatorA==kAnalytical && calculatorB==kAnalytical ){
+      // c = 1. for all MELA_HCP calculations 
+      kd = me2processA/(me2processA+me2processB);
+      return NO_ERR;
+
+    }else if( calculatorA==kAnalytical && calculatorB==kAnalytical ){
+      // c = 1. for all analytical calculations 
+      // NOTE for 0+ vs bkg KD a la HCP: use kMELA_HCP
+      kd = me2processA/(me2processA+me2processB);
+      return NO_ERR;
+
+    }else if( calculatorA==kJHUGen && calculatorB==kJHUGen ){
+      // JHUGen 
+      if( processA==kSMHiggs && processB==k0minus ){
+	// c = 6. for JHUGen when 0+ vs 0-
+	kd = me2processA/(me2processA+6.0*me2processB);
+	return NO_ERR;
+      }else if( processA==kSMHiggs && processB==k2mplus_gg ){
+	// c = 1.2 for JHUGen when 0+ vs 2m+
+	kd = me2processA/(me2processA+1.2*me2processB);
+	return NO_ERR;
+      }else{
+	kd = me2processA/(me2processA+me2processB);
+	return ERR_PROCESS;
+      }
+
+    }else if( calculatorA==kJHUGen && calculatorB==kMCFM ){
+      // qqZZ_MCFMNorm should be used for (JHUGen 0+ vs JHUGen bkg)
+      if( processA==kSMHiggs && processB==kqqZZ ){
+	kd = me2processA/(me2processA+qqZZ_MCFMNorm);
+	return NO_ERR;
+      }else{
+	kd = me2processA/(me2processA+me2processB);
+	return ERR_PROCESS;
+      }
+    }else{
+	kd = me2processA/(me2processA+me2processB);
+	return ERR_PROCESS;
+    }
+
+}
 
 ///----------------------------------------------------------------------------------------------
 /// MEMs::computeMEs - Compute MEs for the supported set of processes.
@@ -336,6 +397,8 @@ void  MEMs::cacheMELAcalculation(vector<TLorentzVector> partP, vector<int> partI
 
   m_computedME[kSMHiggs][kMELA_HCP]         = p0plus_melaNorm;
   m_computedME[kqqZZ][kMELA_HCP]            = bkg_mela;
+
+  qqZZ_MCFMNorm = bkg_VAMCFMNorm;
 
   if(debug)
     std::cout << "Done!" << std::endl;
