@@ -70,7 +70,7 @@ int MEMs::computeME(Processes process, MEMCalcs calculator, vector<TLorentzVecto
       cacheMELAcalculation(partP,partId); 
       me2process=m_computedME[process][calculator];
       break;	  
-    case kMELA_HCP:
+    case kMELA_HCP:     /// compute ME with MELA_HCP
       cacheMELAcalculation(partP,partId); 
       me2process=m_computedME[process][calculator];
       break;
@@ -100,26 +100,26 @@ int MEMs::computeKD(Processes processA, Processes processB, MEMCalcs calculator,
           cacheMELAcalculation(partP,partId); 
           me2processA=m_computedME[processA][calculator];
           me2processB=m_computedME[processB][calculator];
-	  kd=me2processA/(me2processA+me2processB);
+          kd=me2processA/(me2processA+me2processB);
           break;
         case kJHUGen:       /// compute KD with JHUGen
           cacheMELAcalculation(partP,partId); 
           me2processA=m_computedME[processA][calculator];
           me2processB=m_computedME[processB][calculator];
-	  kd=me2processA/(me2processA+me2processB);
-	  break;
+          kd=me2processA/(me2processA+me2processB);
+          break;
         case kMCFM:         /// compute KD with MCFM
-	  cacheMELAcalculation(partP,partId); 
+          cacheMELAcalculation(partP,partId); 
           me2processA=m_computedME[processA][calculator];
           me2processB=m_computedME[processB][calculator];
-	  kd=me2processA/(me2processA+me2processB);
-	  break;
+          kd=me2processA/(me2processA+me2processB);
+          break;
         case kMELA_HCP:         /// compute KD with MCFM
-	  cacheMELAcalculation(partP,partId); 
+          cacheMELAcalculation(partP,partId); 
           me2processA=m_computedME[processA][calculator];
           me2processB=m_computedME[processB][calculator];
-	  kd=me2processA/(me2processA+me2processB);
-	  break;
+          kd=me2processA/(me2processA+me2processB);
+          break;
         default:
             return ERR_PROCESS;
             break;
@@ -194,16 +194,18 @@ int MEMs::computeKD(Processes processA, MEMCalcs calculatorA,
 ///----------------------------------------------------------------------------------------------
 int MEMs::computeMEs(vector<TLorentzVector> partP, vector<int> partId)
 {
+    int returnERR = NO_ERR;
     //loop over MEMCalcs and loop over Processes
     for(int iMemCalc = 0; iMemCalc < NUM_MEMCALCS; iMemCalc++ ) {
         for(int iProcess = 0; iProcess < NUM_PROCESSES; iProcess++ ) {
             if (!isProcSupported[iProcess][iMemCalc]) continue;
             double me2process;
-            if( (computeME(static_cast<Processes>(iProcess), static_cast<MEMCalcs>(iMemCalc), partP, partId, me2process)) != 0 ) return ERR_COMPUTE;
+            if( (computeME(static_cast<Processes>(iProcess), static_cast<MEMCalcs>(iMemCalc), partP, partId, me2process)) != 0 ) {returnERR = ERR_COMPUTE; continue;}
             m_computedME[iProcess][iMemCalc] = me2process;
         }
     }
-    return NO_ERR;
+    //return NO_ERR only if all computations were successful
+    return returnERR;
 }
 
 ///----------------------------------------------------------------------------------------------

@@ -66,10 +66,10 @@ public:
     ///
     /// Compute individual ME for the specified process.
     ///
-    /// \param[in]  process                 names of the process for which the ME should be retrieved (REQUIRED).
-    /// \param[in]  calculator              name of the calculator tool to be used (REQUIRED).
-    /// \param[in]  partP                   the input vector with TLorentzVectors for 4 leptons and 1 photon (REQUIRED).
-    /// \param[in]  partId                  the input vecor with IDs (PDG) for 4 leptons and 1 photon (REQUIRED).
+    /// \param[in]  process                 names of the process for which the ME should be retrieved.
+    /// \param[in]  calculator              name of the calculator tool to be used.
+    /// \param[in]  partP                   the input vector with TLorentzVectors for 4 leptons and 1 photon.
+    /// \param[in]  partId                  the input vecor with IDs (PDG) for 4 leptons and 1 photon.
     /// \param[out] me2process              retrieved |ME|^2 for the specified process and calculator.
     /// \return                             error code of the computation: 0 = NO_ERR, 1 = ERR_PROCESS, 2 = ERR_COMPUTE
     ///
@@ -78,10 +78,10 @@ public:
     ///
     /// Compute individual KD and MEs for process A and process B, obtained with the specified calculator tool.
     ///
-    /// \param[in]  processA, processB      names of the processes A and B for which the KDs and MEs are computed (REQUIRED).
-    /// \param[in]  calculator              name of the calculator tool to be used (REQUIRED).
-    /// \param[in]  partP                   the input vector with TLorentzVectors for 4 leptons and 1 photon (REQUIRED).
-    /// \param[in]  partId                  the input vecor with IDs (PDG) for 4 leptons and 1 photon (REQUIRED).
+    /// \param[in]  processA, processB      names of the processes A and B for which the KDs and MEs are computed.
+    /// \param[in]  calculator              name of the calculator tool to be used.
+    /// \param[in]  partP                   the input vector with TLorentzVectors for 4 leptons and 1 photon.
+    /// \param[in]  partId                  the input vecor with IDs (PDG) for 4 leptons and 1 photon.
     /// \param[out] kd                      computed KD value for discrimination of processes A and B.
     /// \param[out] me2processA             computed |ME|^2 for process A.
     /// \param[out] me2processB             computed |ME|^2 for process B.
@@ -94,11 +94,11 @@ public:
     ///    c will be determined on a case by case basis with 
     ///    the default as 1.  If case is not found 
     /// \param[in]  processA (B)    - name of process to be calculated or numerator (denominator) 
-    ///                               (kSMHiggs, k0minus, etc.) (REQUIRED).
+    ///                               (kSMHiggs, k0minus, etc.).
     /// \param[in]  calculatorA (B) - name of calculator to be used for processA (B)
-    ///                            (kAnalytical, kMCFM, kJHUGen, kMEKD, kMELA_HCP) (REQUIRED)
-    /// \param[out] kd              - kinematic discriminant (REQUIRED)
-    /// \param[out] me2processA (B) - result of processA (B) calculation, |ME|^2 (REQUIRED)
+    ///                            (kAnalytical, kMCFM, kJHUGen, kMEKD, kMELA_HCP)
+    /// \param[out] kd              - kinematic discriminant
+    /// \param[out] me2processA (B) - result of processA (B) calculation, |ME|^2
     ///
     /// \return                     - error code of the computation: 
     ///                               0 = NO_ERR, 1 = ERR_PROCESS, 2 = ERR_COMPUTE
@@ -113,9 +113,9 @@ public:
     ///
     /// Individual MEs and KDs can be retrieved using retrieveME(Processes,MEMCalcs,double&) and computeKD(Processes,MEMCalcs,Processes,MEMCalcs,double(*)(double,double),double&,double&,double&).
     ///
-    /// \param[in]  partP                   the input vector with TLorentzVectors for 4 leptons and 1 photon (REQUIRED).
-    /// \param[in]  partId                  the input vecor with IDs (PDG) for 4 leptons and 1 photon (REQUIRED).
-    /// \return                             error code of the computation: 0 = NO_ERR, 1 = ERR_PROCESS, 2 = ERR_COMPUTE
+    /// \param[in]  partP                   the input vector with TLorentzVectors for 4 leptons and 1 photon.
+    /// \param[in]  partId                  the input vecor with IDs (PDG) for 4 leptons and 1 photon.
+    /// \return                             error code of the computation: 0 = NO_ERR, 2 = ERR_COMPUTE
     ///
     int computeMEs(vector<TLorentzVector> partP, vector<int> partId);
     
@@ -124,8 +124,8 @@ public:
     ///
     /// Method should be called only after running computeMEs(vector<TLorentzVector> partP,vector<int> partId).
     ///
-    /// \param[in]  process                 names of the process for which the ME should be retrieved (REQUIRED).
-    /// \param[in]  calculator              name of the calculator tool to be used (REQUIRED).
+    /// \param[in]  process                 names of the process for which the ME should be retrieved.
+    /// \param[in]  calculator              name of the calculator tool to be used.
     /// \param[out] me2process              retrieved |ME|^2 for the specified process and calculator.
     /// \return                             error codes: 0 = NO_ERR, 1 = ERR_PROCESS
     ///
@@ -137,9 +137,9 @@ public:
     ///
     /// Method should be called only after running computeMEs(vector<TLorentzVector> partP,vector<int> partId).
     ///
-    /// \param[in]  processA, processB          names of the processes for which the KD and MEs are computed (REQUIRED).
-    /// \param[in]  calculatorA, calculatorB    names of the calculator tools to be used (REQUIRED).
-    /// \param[in]  funcKD                      name of the function to be used for KD computation (REQUIRED).
+    /// \param[in]  processA, processB          names of the processes for which the KD and MEs are computed.
+    /// \param[in]  calculatorA, calculatorB    names of the calculator tools to be used.
+    /// \param[in]  funcKD                      name of the function to be used for KD computation.
     /// \param[out] kd                          computed KD value for discrimination of processes A and B.
     /// \param[out] me2processA                 computed |ME|^2 for process A.
     /// \param[out] me2processB                 computed |ME|^2 for process B.
@@ -153,9 +153,9 @@ public:
 
     /// Matrix of supproted processes
     static const bool isProcSupported[NUM_PROCESSES][NUM_MEMCALCS];
-
-    /// for calculating JHUGen/MCFM signal vs background KD
-    double qqZZ_MCFMNorm;
+    
+    /// enums for supported return values/errors
+    enum ERRCodes    {NO_ERR, ERR_PROCESS, ERR_COMPUTE, NUM_ERRORS};
 
 private:
     /// MEM calculators: MEKD (Madgraph) and MELA (Analytic, JHUGen, MCFM)
@@ -170,16 +170,16 @@ private:
 
     /// stored results of MEs computed with computeMEs(...)
     double m_computedME[NUM_PROCESSES][NUM_MEMCALCS];
-
-    /// internal enums for supported return values/errors
-    enum ERRCodes    {NO_ERR, ERR_PROCESS, ERR_COMPUTE, NUM_ERRORS};
     
     /// cache MELA calculiation from old interface
     void cacheMELAcalculation(vector<TLorentzVector> partP, vector<int> partId);
 
-    // caches to avoid multiplemela compuations
-  std::vector<TLorentzVector> partPCache;
-  std::vector<int> partIdCache;
+    /// for calculating JHUGen/MCFM signal vs background KD
+    double qqZZ_MCFMNorm;
+    
+    // caches to avoid multiplemela computations
+    std::vector<TLorentzVector> partPCache;
+    std::vector<int> partIdCache;
 };
 
 
@@ -198,7 +198,7 @@ const bool MEMs::isProcSupported[MEMNames::NUM_PROCESSES][MEMNames::NUM_MEMCALCS
 
 
 /// MEKD process name translation - initialisation (to be updated)
-const TString MEMs::m_processNameMEKD[MEMNames::NUM_PROCESSES] = {"SMHiggs", "Higgs0PH", "Higgs0M", "", "", "Graviton2PM", "", "ZZ", ""};
+const TString MEMs::m_processNameMEKD[MEMNames::NUM_PROCESSES] = {"SMHiggs", "Spin0PH", "Higgs0M", "", "", "Graviton2PM", "", "ZZ", ""};
 
 //////////////////////////////////////////////////////////////////////////
 
