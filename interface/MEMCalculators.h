@@ -146,10 +146,29 @@ public:
     /// \return                                 error code of the computation: 0 = NO_ERR, 1 = ERR_PROCESS
     ///
     int computeKD(Processes processA, MEMCalcs calculatorA, Processes processB, MEMCalcs calculatorB, double (MEMs::*funcKD)(double, double), double& kd, double& me2processA, double& me2processB );
+
+    ///
+    /// Compute KD and retrieve MEs for process A and process B, obtained with the specified calculator tool.
+    /// The KD is computed using KD function specified by the user (considers varioius processes-calculator cases)
+    /// as kd = funcKD(processA, calculatorA, processB, calculatorB).
+    ///
+    /// Method should be called only after running computeMEs(vector<TLorentzVector> partP,vector<int> partId).
+    ///
+    /// \param[in]  processA, processB          names of the processes for which the KD and MEs are computed.
+    /// \param[in]  calculatorA, calculatorB    names of the calculator tools to be used.
+    /// \param[in]  funcKD                      name of the function to be used for KD computation.
+    /// \param[out] kd                          computed KD value for discrimination of processes A and B.
+    /// \param[out] me2processA                 computed |ME|^2 for process A.
+    /// \param[out] me2processB                 computed |ME|^2 for process B.
+    /// \return                                 error code of the computation: 0 = NO_ERR, 1 = ERR_PROCESS
+    ///
+    int computeKD(Processes processA, MEMCalcs calculatorA, Processes processB, MEMCalcs calculatorB, double (MEMs::*funcKD)(Processes, MEMCalcs, Processes, MEMCalcs), double& kd, double& me2processA, double& me2processB );
     
-    /// Supproted KD functions, kd = f_KD(me2processA, me2processB).
+    /// Supproted simple KD function: kd = f_KD(me2processA, me2processB).
     double logRatio(double me2processA, double me2processB);
-    double probRatio(double me2processA, double me2processB);
+    
+    /// Supproted case-dependent KD function: kd = f_KD(processA, calculatorA, processB, calculatorB).
+    double probRatio(Processes processA, MEMCalcs calculatorA, Processes processB, MEMCalcs calculatorB);
 
     /// Matrix of supproted processes
     static const bool isProcSupported[NUM_PROCESSES][NUM_MEMCALCS];

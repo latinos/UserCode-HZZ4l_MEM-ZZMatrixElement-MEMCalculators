@@ -244,6 +244,21 @@ int MEMs::computeKD(Processes processA, MEMCalcs calculatorA, Processes processB
 }
 
 ///----------------------------------------------------------------------------------------------
+/// MEMs::computeKD - Compute KD for process A and process B, for specified calculator.
+///----------------------------------------------------------------------------------------------
+int MEMs::computeKD(Processes processA, MEMCalcs calculatorA, Processes processB, MEMCalcs calculatorB, double (MEMs::*funcKD)(Processes, MEMCalcs, Processes, MEMCalcs), double& kd, double& me2processA, double& me2processB )
+{
+    /// check if processes are supported
+    if (!isProcSupported[processA][calculatorA]) return ERR_PROCESS;
+    if (!isProcSupported[processB][calculatorB]) return ERR_PROCESS;
+    
+    //// compute KD
+    kd = (*this.*funcKD)(processA, calculatorA, processB, calculatorB);
+    
+    return NO_ERR;
+}
+
+///----------------------------------------------------------------------------------------------
 /// MEMs::logRatio - KD function which returns ln( me2processA / me2processB )
 ///----------------------------------------------------------------------------------------------
 double MEMs::logRatio(double me2processA, double me2processB){
@@ -254,8 +269,39 @@ double MEMs::logRatio(double me2processA, double me2processB){
 ///----------------------------------------------------------------------------------------------
 /// MEMs::probRatio - KD function which returns me2processA / ( me2processA + c * me2processB )
 ///----------------------------------------------------------------------------------------------
-double MEMs::probRatio(double me2processA, double me2processB){
-    double c = 3000;
+double MEMs::probRatio(Processes processA, MEMCalcs calculatorA, Processes processB, MEMCalcs calculatorB)
+{
+    /// check if processes are supported
+    if (!isProcSupported[processA][calculatorA]) return ERR_PROCESS;
+    if (!isProcSupported[processB][calculatorB]) return ERR_PROCESS;
+
+    /// retrieve already computed MEs
+    double me2processA = m_computedME[processA][calculatorA];
+    double me2processB = m_computedME[processB][calculatorB];
+
+    // compute KD per case basis (for the time being, find more elegant solution later)
+    double c;
+    // determine c
+    // keep c = 1. for all MELA_HCP calculations
+    // if case is not known, use c=1. - this is not necessarily wrong though.
+    if( (calculatorA==kJHUGen || calculatorA==kMEKD) && (calculatorB==kJHUGen || calculatorB==kMEKD) ){ // (JHUGen or MEKD)
+        if( processA==kSMHiggs && processB==k0minus ){
+            c = 6.; // for JHUGen or MEKD when 0+ vs 0-
+        }else if( processA==kSMHiggs && processB==k2mplus_gg ){
+            c = 1.2; // for JHUGen or MEKD when 0+ vs 2m+
+        }else{
+            c = 1.; // default for all "non-known" cases
+        }
+    }else if( (calculatorA==kJHUGen || calculatorA==kMEKD) && calculatorB==kMCFM ){ // (JHUGen or MEKD) vs. MCFM
+        if( processA==kSMHiggs && processB==kqqZZ ){
+            c = qqZZ_MCFMNorm/me2processB; // qqZZ_MCFMNorm should be used for (JHUGen or MEKD 0+ vs MCFM bkg)
+        }else{
+            c = 1.; // default for all "non-known" cases
+        }
+    }else{
+        c = 1.; // default for all "non-known" cases
+    }
+    
     if (me2processA + c * me2processB == 0) return -999.;
     return me2processA/( me2processA + c * me2processB );
 }
