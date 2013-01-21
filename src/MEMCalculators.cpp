@@ -50,6 +50,8 @@ MEMs::MEMs(double collisionEnergy, string PDFName, bool debug_)
 ///----------------------------------------------------------------------------------------------
 int MEMs::computeME(Processes process, MEMCalcs calculator, vector<TLorentzVector> partP, vector<int> partId, double& me2process)
 {
+
+  //std::cout << m_processNameMEKD[process] << " " << calculator <<std::endl;
     /// check if process is supported
     if (!isProcSupported[process][calculator]) return ERR_PROCESS;
     
@@ -57,6 +59,7 @@ int MEMs::computeME(Processes process, MEMCalcs calculator, vector<TLorentzVecto
     switch ( calculator ) {
     case kMEKD:         /// compute ME with MEKD
       if( (m_MEKD->computeME(m_processNameMEKD[process], partP, partId, me2process)) != 0 ) return ERR_COMPUTE;
+      //std::cout <<"MEKD: " << m_processNameMEKD[process] << " : " << me2process << std::endl;
       break;
     case kAnalytical:  	  /// compute ME with MELA
       cacheMELAcalculation(partP,partId); 
@@ -93,7 +96,8 @@ int MEMs::computeKD(Processes processA, Processes processB, MEMCalcs calculator,
     
     /// perform computation according to the specified process and MEM package
     switch ( calculator ) {
-        case kMEKD:         /// compute KD with MEKD
+    case kMEKD:         /// compute KD with MEKD
+      //std::cout << m_processNameMEKD[processA] << " " << m_processNameMEKD[processB] << std::endl;
             if( (m_MEKD->computeKD(m_processNameMEKD[processA], m_processNameMEKD[processB], partP, partId, kd, me2processA, me2processB)) != 0 ) return ERR_COMPUTE;
             break;
         case kAnalytical:   /// compute KD with MELA
@@ -379,8 +383,8 @@ void  MEMs::cacheMELAcalculation(vector<TLorentzVector> partP, vector<int> partI
   m_computedME[kSMHiggs][kAnalytical]      = p0plus_mela;
   m_computedME[k0minus][kAnalytical]       = p0minus_mela;
   m_computedME[k0hplus][kAnalytical]       = p0hplus_mela;
-  m_computedME[k1minus][kAnalytical]       = p1_VAJHU;
-  m_computedME[k1plus][kAnalytical]        = p1plus_VAJHU;
+  m_computedME[k1minus][kAnalytical]       = p1_mela;
+  m_computedME[k1plus][kAnalytical]        = p1plus_mela;
   m_computedME[k2mplus_gg][kAnalytical]    = p2_mela;
   m_computedME[k2mplus_qqbar][kAnalytical] = p2qqb_mela;
   m_computedME[kqqZZ][kAnalytical]         = bkg_mela;
