@@ -35,6 +35,9 @@ using namespace std;
 ///  MEMNames namespace provides enum types for names of processes and
 ///  names of tools/calculators supported by MELA and MEKD packages.
 ///
+///  More details can be found at the TWiki:
+///    https://twiki.cern.ch/twiki/bin/view/CMS/HZZ4lME
+///
 //////////////////////////////////////////////////////////////////////////
 namespace MEMNames {
     /// Enum type for supported processes in MELA and MEKD packages
@@ -119,7 +122,7 @@ public:
     ///
     /// \param[in]  processA, processB          names of the processes for which the KD and MEs are computed.
     /// \param[in]  calculatorA, calculatorB    names of the calculator tools to be used.
-    /// \param[in]  funcKD                      name of the function to be used for KD computation.
+    /// \param[in]  funcKD                      name of the method to be used for KD computation.
     /// \param[out] kd                          computed KD value for discrimination of processes A and B.
     /// \param[out] me2processA                 computed |ME|^2 for process A.
     /// \param[out] me2processB                 computed |ME|^2 for process B.
@@ -129,14 +132,15 @@ public:
 
     ///
     /// Compute KD and retrieve MEs for process A and process B, obtained with the specified calculator tool.
-    /// The KD is computed using KD function specified by the user (considers varioius processes-calculator cases)
-    /// as kd = funcKD(processA, calculatorA, processB, calculatorB).
+    /// The KD is computed using KD function specified by the user which has defferent implementations for
+    /// different combinations of processes and calculator tools. Functions is of the form
+    /// kd = funcKD(processA, calculatorA, processB, calculatorB).
     ///
     /// Method should be called only after running computeMEs(vector<TLorentzVector> partP,vector<int> partId).
     ///
     /// \param[in]  processA, processB          names of the processes for which the KD and MEs are computed.
     /// \param[in]  calculatorA, calculatorB    names of the calculator tools to be used.
-    /// \param[in]  funcKD                      name of the function to be used for KD computation.
+    /// \param[in]  funcKD                      name of the method to be used for KD computation.
     /// \param[out] kd                          computed KD value for discrimination of processes A and B.
     /// \param[out] me2processA                 computed |ME|^2 for process A.
     /// \param[out] me2processB                 computed |ME|^2 for process B.
@@ -144,10 +148,10 @@ public:
     ///
     int computeKD(Processes processA, MEMCalcs calculatorA, Processes processB, MEMCalcs calculatorB, double (MEMs::*funcKD)(Processes, MEMCalcs, Processes, MEMCalcs), double& kd, double& me2processA, double& me2processB );
     
-    /// Supproted simple KD function: kd = f_KD(me2processA, me2processB).
+    /// Simple KD function: kd = log(me2processA / me2processB).
     double logRatio(double me2processA, double me2processB);
     
-    /// Supproted case-dependent KD function: kd = f_KD(processA, calculatorA, processB, calculatorB).
+    /// Case-dependent KD function of a general form: kd = me2processA / (me2processA + c * me2processB).
     double probRatio(Processes processA, MEMCalcs calculatorA, Processes processB, MEMCalcs calculatorB);
 
     /// Matrix of supproted processes

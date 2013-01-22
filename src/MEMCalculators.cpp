@@ -224,20 +224,22 @@ double MEMs::probRatio(Processes processA, MEMCalcs calculatorA, Processes proce
     double c;
     // determine c
     // keep c = 1. for all MELA_HCP calculations
-    // if case is not known, use c=1. - this is not necessarily wrong though.
+    // if case is not known, use c = 1. - this is not necessarily wrong though.
     if( (calculatorA==kJHUGen || calculatorA==kMEKD) && (calculatorB==kJHUGen || calculatorB==kMEKD) ){ // (JHUGen or MEKD)
         if( processA==kSMHiggs && processB==k0minus ){
             c = 6.; // for JHUGen or MEKD when 0+ vs 0-
         }else if( processA==kSMHiggs && processB==k2mplus_gg ){
             c = 1.2; // for JHUGen or MEKD when 0+ vs 2m+
-        }else if ( processA==kSMHiggs && processB==kqqZZ ){
-            c = qqZZ_MCFMNorm/m_computedME[processB][kMCFM]; // qqZZ_MCFMNorm/qqZZ_MCFM should be used for (JHUGen or MEKD) 0+ vs MEKD bkg
+        }else if ( processB==kqqZZ ){
+            c = 1.;
+            me2processB = qqZZ_MCFMNorm; // qqZZ_MCFMNorm/qqZZ_MCFM should be used for (JHUGen or MEKD) signal vs MEKD bkg
         }else{
             c = 1.; // default for all "non-known" cases
         }
     }else if( (calculatorA==kJHUGen || calculatorA==kMEKD) && (calculatorB==kMCFM) ){ // (JHUGen or MEKD) vs. MCFM
-        if( processA==kSMHiggs && processB==kqqZZ ){
-            c = qqZZ_MCFMNorm/m_computedME[processB][kMCFM]; // qqZZ_MCFMNorm/qqZZ_MCFM should be used for (JHUGen or MEKD) 0+ vs MCFM bkg
+        if( processB==kqqZZ ){
+            c = 1.;
+            me2processB = qqZZ_MCFMNorm; // qqZZ_MCFMNorm/qqZZ_MCFM should be used for (JHUGen or MEKD) signal vs MCFM bkg
         }else{
             c = 1.; // default for all "non-known" cases
         }
