@@ -12,12 +12,11 @@ using namespace std;
 
 vector<TLorentzVector> Calculate4Momentum(double Mx,double M1,double M2,double theta,double theta1,double theta2,double Phi1,double Phi,double pt4l, double Y4l);
 
-void testMEMCalc(){
+void testMEMCalc(TString fileName,int channel){
 
   TChain* t = new TChain("SelectedTree");
-  t->Add("HZZ4lTree_jhuPseH125_withProbabilities_4e.root");
+  t->Add(fileName);
   
-  TString fileName = "HZZ4lTree_jhuPseH125_withProbabilities_4e.root";
   fileName.ReplaceAll(".root","_test.root");
   TFile* file = new TFile(fileName,"RECREATE");
 
@@ -35,6 +34,13 @@ void testMEMCalc(){
   double p0minus_VAJHU_test,p1_VAJHU_test;
 
   double qqZZ_VAMCFM_test,ggZZ_VAMCFM_test,p0plus_VAMCFM_test;
+  double qqZZ_VAMCFMNorm_test;
+
+  double p0plus_mad, p0minus_mad, p2_mad, qqZZ_mad;
+
+  double KDsigbkg, KD0minus, KD0hplus, KD2mplus;
+
+  double dummy1,dummy2;
 
   // new branches
   tree->Branch("p0plus_mela_test",&p0plus_mela_test,"p0plus_mela_test/D");
@@ -50,6 +56,7 @@ void testMEMCalc(){
 
   tree->Branch("p0plus_VAMCFM_test",&p0plus_VAMCFM_test,"p0plus_VAMCFM_test/D");
   tree->Branch("qqZZ_VAMCFM_test",&qqZZ_VAMCFM_test,"qqZZ_VAMCFM_test/D");
+  tree->Branch("qqZZ_VAMCFMNorm_test",&qqZZ_VAMCFMNorm_test,"qqZZ_VAMCFMNorm_test/D");
   tree->Branch("ggZZ_VAMCFM_test",&ggZZ_VAMCFM_test,"ggZZ_VAMCFM_test/D");
 
   tree->Branch("p0plus_VAJHU_test",&p0plus_VAJHU_test,"p0plus_VAJHU_test/D");
@@ -59,6 +66,16 @@ void testMEMCalc(){
   tree->Branch("p1plus_VAJHU_test",&p1plus_VAJHU_test,"p1plus_VAJHU_test/D");
   tree->Branch("p2_VAJHU_test",&p2_VAJHU_test,"p2_VAJHU_test/D");
   tree->Branch("p2qqb_VAJHU_test",&p2qqb_VAJHU_test,"p2qqb_VAJHU_test/D");
+
+  tree->Branch("p2_mad",&p2_mad,"p2_mad/D");
+  tree->Branch("p0plus_mad",&p0plus_mad,"p0plus_mad/D");
+  tree->Branch("p0minus_mad",&p0minus_mad,"p0minus_mad/D");
+  tree->Branch("qqZZ_mad",&qqZZ_mad,"qqZZ_mad/D");
+
+  tree->Branch("KDsigbkg",&KDsigbkg,"KDsigbkg/D");
+  tree->Branch("KD0minus",&KD0minus,"KD0minus/D");
+  tree->Branch("KD0hplus",&KD0hplus,"KD0hplus/D");
+  tree->Branch("KD2mplus",&KD2mplus,"KD2mplus/D");
 
   // old branches
 
@@ -77,15 +94,34 @@ void testMEMCalc(){
 
   vector<TLorentzVector> p4;
   vector<int> id;
-  id.push_back(11);
-  id.push_back(-11);
-  id.push_back(11);
-  id.push_back(-11);  
 
-  for(int i=0 ; i<10/*t->GetEntries()*/; i++){
+  // channel 1: 4e 2: 4mu 2: 2e2mu
+  if(channel==1){
+    id.push_back(11);
+    id.push_back(-11);
+    id.push_back(11);
+    id.push_back(-11);  
+  }
+  if(channel==2){
+    id.push_back(13);
+    id.push_back(-13);
+    id.push_back(13);
+    id.push_back(-13);  
+  }
+  if(channel==3){
+    id.push_back(11);
+    id.push_back(-11);
+    id.push_back(13);
+    id.push_back(-13);  
+  }
+
+  for(int i=0 ; i<t->GetEntries(); i++){
 
     t->GetEntry(i);
-    t->Show(i);
+    //t->Show(i);
+    if ( i % 1000 == 0 ) cout << i << "/" << t->GetEntries() << endl;
+
+    if(mzz>140) continue;
 
     p4 = Calculate4Momentum(mzz,m1,m2,acos(hs),acos(h1),acos(h2),phi1,phi,pt4l,Y4l);
     
@@ -112,6 +148,36 @@ void testMEMCalc(){
     test.computeME(k2mplus_gg,kJHUGen,p4,id,p2_VAJHU_test);
     test.computeME(k2mplus_qqbar,kJHUGen,p4,id,p2qqb_VAJHU_test);
 
+    test.computeME(kSMHiggs,kMEKD,p4,id,p0plus_mad);
+    test.computeME(k2mplus_gg,kMEKD,p4,id,p2_mad);
+    test.computeME(k0minus,kMEKD,p4,id,p0minus_mad);
+    test.computeME(kqqZZ,kMEKD,p4,id,qqZZ_mad);
+
+    qqZZ_VAMCFMNorm_test=test.qqZZ_MCFMNorm;
+
+    test.computeMEs(p4,id);
+
+    test.computeKD(kSMHiggs,kJHUGen,kqqZZ,kMCFM,&MEMs::probRatio,KDsigbkg,dummy1,dummy2);
+    test.computeKD(kSMHiggs,kJHUGen,k0minus,kJHUGen,&MEMs::probRatio,KD0minus,dummy1,dummy2);
+    test.computeKD(kSMHiggs,kJHUGen,k0hplus,kJHUGen,&MEMs::probRatio,KD0hplus,dummy1,dummy2);
+    test.computeKD(kSMHiggs,kJHUGen,k2mplus_gg,kJHUGen,&MEMs::probRatio,KD2mplus,dummy1,dummy2);
+    double KD;
+    test.computeKD(kSMHiggs,kMEKD,kqqZZ,kMCFM,&MEMs::probRatio,KD,dummy1,dummy2);
+
+    if(KD>=1.0 || KD<=0.0)
+      cout << "KD: " << KD << endl;
+    /*
+    cout << "p0plusJHU: " << p0plus_VAJHU_test << endl;
+    cout << "qqZZMCFM: " << qqZZ_VAMCFMNorm_test << endl;
+    cout << "sigbkg: " << KDsigbkg << endl;
+    */
+
+    /*
+    cout << "p0plus: " << p0plus_mad << endl;
+    cout << "p0minus: " << p0minus_mad << endl;
+    cout << "p2: " << p2_mad << endl;
+    cout << "qqZZ: " << qqZZ_mad << endl;
+
     double KD,pA,pB;
     test.computeKD(kSMHiggs,k0minus,kAnalytical,p4,id,KD,pA,pB);
     cout << "pseudoMELA: " << KD << endl;
@@ -119,6 +185,7 @@ void testMEMCalc(){
     cout << "graviMELA: " << KD << endl;
     test.computeKD(kSMHiggs,kqqZZ,kMELA_HCP,p4,id,KD,pA,pB);
     cout << "MELA: " << KD << endl;
+    */
 
     tree->Fill();
 
