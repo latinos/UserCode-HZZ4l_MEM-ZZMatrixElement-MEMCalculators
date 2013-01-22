@@ -252,7 +252,10 @@ int MEMs::computeKD(Processes processA, MEMCalcs calculatorA, Processes processB
     if (!isProcSupported[processA][calculatorA]) return ERR_PROCESS;
     if (!isProcSupported[processB][calculatorB]) return ERR_PROCESS;
     
-    //// compute KD
+    /// retrieve already computed MEs
+    me2processA = m_computedME[processA][calculatorA];
+    me2processB = m_computedME[processB][calculatorB];
+    /// compute KD
     kd = (*this.*funcKD)(processA, calculatorA, processB, calculatorB);
     
     return NO_ERR;
@@ -289,12 +292,16 @@ double MEMs::probRatio(Processes processA, MEMCalcs calculatorA, Processes proce
             c = 6.; // for JHUGen or MEKD when 0+ vs 0-
         }else if( processA==kSMHiggs && processB==k2mplus_gg ){
             c = 1.2; // for JHUGen or MEKD when 0+ vs 2m+
+        }else if ( processA==kSMHiggs && processB==kqqZZ ){
+            c = qqZZ_MCFMNorm/m_computedME[processB][kMCFM]; // qqZZ_MCFMNorm/qqZZ_MCFM should be used for (JHUGen or MEKD) 0+ vs MEKD bkg
+            cout << "c: " << c << endl;
         }else{
             c = 1.; // default for all "non-known" cases
         }
-    }else if( (calculatorA==kJHUGen || calculatorA==kMEKD) && calculatorB==kMCFM ){ // (JHUGen or MEKD) vs. MCFM
+    }else if( (calculatorA==kJHUGen || calculatorA==kMEKD) && (calculatorB==kMCFM) ){ // (JHUGen or MEKD) vs. MCFM
         if( processA==kSMHiggs && processB==kqqZZ ){
-            c = qqZZ_MCFMNorm/me2processB; // qqZZ_MCFMNorm should be used for (JHUGen or MEKD 0+ vs MCFM bkg)
+            c = qqZZ_MCFMNorm/m_computedME[processB][kMCFM]; // qqZZ_MCFMNorm/qqZZ_MCFM should be used for (JHUGen or MEKD) 0+ vs MCFM bkg
+            cout << "c: " << c << endl;
         }else{
             c = 1.; // default for all "non-known" cases
         }
