@@ -160,6 +160,11 @@ public:
     /// enums for supported return values/errors
     enum ERRCodes    {NO_ERR, ERR_PROCESS, ERR_COMPUTE, NUM_ERRORS};
 
+
+    double getMELAWeight() { return m_weight;}
+
+
+
 private:
     /// MEM calculators: MEKD (Madgraph) and MELA (Analytic, JHUGen, MCFM)
     MEKD* m_MEKD;
@@ -173,6 +178,10 @@ private:
 
     /// stored results of MEs computed with computeMEs(...)
     double m_computedME[NUM_PROCESSES][NUM_MEMCALCS];
+
+    ///Mike : Also add weights for interference in caching
+    float m_weight;
+
     
     /// cache MELA calculiation from old interface
     void cacheMELAcalculation(vector<TLorentzVector> partP, vector<int> partId);
