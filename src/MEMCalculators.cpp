@@ -42,8 +42,6 @@ MEMs::MEMs(double collisionEnergy, string PDFName, bool debug_)
         for(int iProcess = 0; iProcess < NUM_PROCESSES; iProcess++ )
             m_computedME[iProcess][iMemCalc] = -999.;
 
-
-    m_weight=0.0;
 }
 
 
@@ -229,9 +227,9 @@ double MEMs::probRatio(Processes processA, MEMCalcs calculatorA, Processes proce
     // if case is not known, use c = 1. - this is not necessarily wrong though.
     if( (calculatorA==kJHUGen || calculatorA==kMEKD) && (calculatorB==kJHUGen || calculatorB==kMEKD) ){ // (JHUGen or MEKD)
         if( processA==kSMHiggs && processB==k0minus ){
-            c = 6.; // for JHUGen or MEKD when 0+ vs 0-
+            c = 1.; // for JHUGen or MEKD when 0+ vs 0-
         }else if( processA==kSMHiggs && processB==k2mplus_gg ){
-            c = 1.2; // for JHUGen or MEKD when 0+ vs 2m+
+            c = 1.; // for JHUGen or MEKD when 0+ vs 2m+
         }else if ( processB==kqqZZ ){
             c = 1.;
             me2processB = qqZZ_MCFMNorm; // qqZZ_MCFMNorm/qqZZ_MCFM should be used for (JHUGen or MEKD) signal vs MEKD bkg
@@ -369,20 +367,6 @@ void  MEMs::cacheMELAcalculation(vector<TLorentzVector> partP, vector<int> partI
 		   //optional input parameters
 		   pt4l,Y4l,flavor // 1:4e, 2:4mu, 3:2e2mu (for interference effects)
 		   );
-
-
-
-  ///Mike: Add weight calculation
-  m_MELA->computeWeight( mzz, m1,  m2, 
-			costhetastar,
-			costheta1, 
-			costheta2,
-			phi,
-			phi1,
-			// return variables:
-			m_weight);  
-
-
 
   if(debug)
     std::cout << "got MEs" << std::endl;
