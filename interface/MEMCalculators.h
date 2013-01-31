@@ -13,12 +13,7 @@
 #include <cmath>
 
 // ROOT includes
-#include "TROOT.h"
-#include "TFile.h"
 #include "TString.h"
-#include "TMath.h"
-#include "TTree.h"
-#include "TTreeIndex.h"
 #include "TLorentzVector.h"
 
 // MELA
@@ -209,8 +204,6 @@ const bool MEMs::isProcSupported[MEMNames::NUM_PROCESSES][MEMNames::NUM_MEMCALCS
   {0,            0,          0,          1,          0}};     // kggZZ
 
 
-/// MEKD process name translation - initialisation (to be updated)
-const TString MEMs::m_processNameMEKD[MEMNames::NUM_PROCESSES] = {"SMHiggs", "Spin0PH", "Higgs0M", "", "", "Graviton2PM", "", "ZZ", ""};
 
 //////////////////////////////////////////////////////////////////////////
 

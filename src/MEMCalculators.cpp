@@ -24,6 +24,9 @@ using namespace MEMNames;
 //////////////////////////////////////////////////////////////////////////
 
 
+/// MEKD process name translation - initialisation (to be updated)
+const TString MEMs::m_processNameMEKD[MEMNames::NUM_PROCESSES] = {"SMHiggs", "Spin0PH", "Higgs0M", "", "", "Graviton2PM", "", "ZZ", ""};
+
 ///----------------------------------------------------------------------------------------------
 /// MEMs::MEMs - constructor
 ///----------------------------------------------------------------------------------------------
