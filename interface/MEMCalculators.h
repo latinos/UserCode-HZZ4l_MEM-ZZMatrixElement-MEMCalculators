@@ -142,7 +142,16 @@ public:
     /// \return                                 error code of the computation: 0 = NO_ERR, 1 = ERR_PROCESS
     ///
     int computeKD(Processes processA, MEMCalcs calculatorA, Processes processB, MEMCalcs calculatorB, double (MEMs::*funcKD)(Processes, MEMCalcs, Processes, MEMCalcs), double& kd, double& me2processA, double& me2processB );
-    
+
+    ///
+    /// Retrieve the interference reweighting factor for the given event, computed using the JHUGen.
+    ///
+    /// Method should be called only after running computeMEs(vector<TLorentzVector> partP,vector<int> partId).
+    ///
+    /// \return                                 interference reweighting factor for the given event.
+    ///
+    double getMELAWeight() { return m_weight;}
+
     /// Simple KD function: kd = log(me2processA / me2processB).
     double logRatio(double me2processA, double me2processB);
     
@@ -154,11 +163,6 @@ public:
     
     /// enums for supported return values/errors
     enum ERRCodes    {NO_ERR, ERR_PROCESS, ERR_COMPUTE, NUM_ERRORS};
-
-
-    double getMELAWeight() { return m_weight;}
-
-
 
 private:
     /// MEM calculators: MEKD (Madgraph) and MELA (Analytic, JHUGen, MCFM)
@@ -196,10 +200,10 @@ const bool MEMs::isProcSupported[MEMNames::NUM_PROCESSES][MEMNames::NUM_MEMCALCS
   {1,            1,          1,          1,          1},      // kSMHiggs
   {1,            1,          1,          0,          0},      // k0hplus
   {1,            1,          1,          0,          0},      // k0minus
-  {1,            0,          1,          0,          0},      // k1plus
-  {1,            0,          1,          0,          0},      // k1minus
+  {1,            1,          1,          0,          0},      // k1plus
+  {1,            1,          1,          0,          0},      // k1minus
   {1,            1,          1,          0,          0},      // k2mplus_gg
-  {1,            0,          1,          0,          0},      // k2mplus_qqbar
+  {1,            1,          1,          0,          0},      // k2mplus_qqbar
   {1,            1,          0,          1,          1},      // kqqZZ
   {0,            0,          0,          1,          0}};     // kggZZ
 

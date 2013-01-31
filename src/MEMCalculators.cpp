@@ -25,7 +25,7 @@ using namespace MEMNames;
 
 
 /// MEKD process name translation - initialisation (to be updated)
-const TString MEMs::m_processNameMEKD[MEMNames::NUM_PROCESSES] = {"SMHiggs", "Spin0PH", "Higgs0M", "", "", "Graviton2PM", "", "ZZ", ""};
+const TString MEMs::m_processNameMEKD[MEMNames::NUM_PROCESSES] = {"SMHiggs", "Spin0PH", "Higgs0M", "Spin1P", "Spin1M", "Graviton2PM", "qqGraviton2PM", "ZZ", ""};
 
 ///----------------------------------------------------------------------------------------------
 /// MEMs::MEMs - constructor
@@ -45,6 +45,7 @@ MEMs::MEMs(double collisionEnergy, string PDFName, bool debug_)
         for(int iProcess = 0; iProcess < NUM_PROCESSES; iProcess++ )
             m_computedME[iProcess][iMemCalc] = -999.;
 
+    m_weight = 0.0;
 }
 
 
@@ -370,6 +371,16 @@ void  MEMs::cacheMELAcalculation(vector<TLorentzVector> partP, vector<int> partI
 		   //optional input parameters
 		   pt4l,Y4l,flavor // 1:4e, 2:4mu, 3:2e2mu (for interference effects)
 		   );
+
+    /// Add weight calculation
+  m_MELA->computeWeight(mzz, m1,  m2,
+                        costhetastar,
+                        costheta1,
+                        costheta2,
+                        phi,
+                        phi1,
+                        // return variables:
+                        m_weight);
 
   if(debug)
     std::cout << "got MEs" << std::endl;
