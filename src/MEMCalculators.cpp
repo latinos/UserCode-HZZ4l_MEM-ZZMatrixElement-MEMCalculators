@@ -265,7 +265,7 @@ int  MEMs::cacheMELAcalculation(vector<TLorentzVector> partP, vector<int> partId
     std::cout << " MEMs::cacheMELAcalculation " << std::endl;
   
   if( partPCache==partP &&  partIdCache==partId) // do nothing if we have already processed these
-    return;
+    return NO_ERR;
 
   partPCache = partP;
   partIdCache = partId;
@@ -313,11 +313,11 @@ int  MEMs::cacheMELAcalculation(vector<TLorentzVector> partP, vector<int> partId
 		      partP[2], partId[2], partP[3], partId[3],
 		      costhetastar,costheta1,costheta2,phi,phi1);
 
-  if(TMath::IsNan(costhetastar)||
-     TMath::IsNan(costhetastar)||
-     TMath::IsNan(costhetastar)||
-     TMath::IsNan(costhetastar)||
-     TMath::IsNan(costhetastar) ) return ERR_COMPUTE; 
+  if(TMath::IsNaN(costhetastar)||
+     TMath::IsNaN(costhetastar)||
+     TMath::IsNaN(costhetastar)||
+     TMath::IsNaN(costhetastar)||
+     TMath::IsNaN(costhetastar) ) return ERR_COMPUTE; 
 
   float m1=(partP[0] + partP[1]).M();
   float m2=(partP[2] + partP[3]).M();
@@ -427,6 +427,8 @@ int  MEMs::cacheMELAcalculation(vector<TLorentzVector> partP, vector<int> partId
 
   if(debug)
     std::cout << "Done!" << std::endl;
+
+  return NO_ERR;
 
 }  
 
