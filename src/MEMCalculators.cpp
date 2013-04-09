@@ -259,7 +259,7 @@ double MEMs::probRatio(Processes processA, MEMCalcs calculatorA, Processes proce
 ///----------------------------------------------------------------------------------------------
 /// MEMCalculators::cacheMELAcalculation - method to interface with Mela::computeP and cache results
 ///----------------------------------------------------------------------------------------------
-void  MEMs::cacheMELAcalculation(vector<TLorentzVector> partP, vector<int> partId){
+int  MEMs::cacheMELAcalculation(vector<TLorentzVector> partP, vector<int> partId){
 
   if(debug)
     std::cout << " MEMs::cacheMELAcalculation " << std::endl;
@@ -312,6 +312,12 @@ void  MEMs::cacheMELAcalculation(vector<TLorentzVector> partP, vector<int> partI
   mela::computeAngles(partP[0], partId[0], partP[1], partId[1], 
 		      partP[2], partId[2], partP[3], partId[3],
 		      costhetastar,costheta1,costheta2,phi,phi1);
+
+  if(TMath::IsNan(costhetastar)||
+     TMath::IsNan(costhetastar)||
+     TMath::IsNan(costhetastar)||
+     TMath::IsNan(costhetastar)||
+     TMath::IsNan(costhetastar) ) return ERR_COMPUTE; 
 
   float m1=(partP[0] + partP[1]).M();
   float m2=(partP[2] + partP[3]).M();

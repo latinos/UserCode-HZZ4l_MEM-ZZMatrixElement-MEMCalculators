@@ -183,7 +183,7 @@ private:
 
     
     /// cache MELA calculiation from old interface
-    void cacheMELAcalculation(vector<TLorentzVector> partP, vector<int> partId);
+    int cacheMELAcalculation(vector<TLorentzVector> partP, vector<int> partId);
 
     /// for calculating JHUGen/MCFM signal vs background KD
     double qqZZ_MCFMNorm;
