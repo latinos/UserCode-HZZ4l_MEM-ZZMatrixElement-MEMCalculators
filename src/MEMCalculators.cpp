@@ -33,12 +33,50 @@ const TString MEMs::m_processNameMEKD[MEMNames::NUM_PROCESSES] = {"SMHiggs", "Sp
 MEMs::MEMs(double collisionEnergy, string PDFName, bool debug_)
 {
 
+    /// Mapping between MEMs process enums and MELA process enums 
+    /// - initialisation (to be updated)
+    MELAprocMap[kSMHiggs]     =TVar::HZZ_4l;
+    MELAprocMap[k0hplus]      =TVar::HDHZZ_4l;
+    MELAprocMap[k0minus]      =TVar::PSHZZ_4l;
+    MELAprocMap[k1plus]       =TVar::AVZZ_4l;
+    MELAprocMap[k1minus]      =TVar::VZZ_4l;
+    MELAprocMap[k2mplus_gg]   =TVar::TZZ_4l;
+    MELAprocMap[k2mplus_qqbar]=TVar::TZZ_4l;
+    MELAprocMap[k2hplus]      =TVar::TZZ_2hplus_4l;
+    MELAprocMap[k2hminus]     =TVar::PTZZ_2hminus_4l;
+    MELAprocMap[k2bplus]      =TVar::TZZ_2bplus_4l;
+    MELAprocMap[kqqZZ]        =TVar::ZZ_4e;
+    MELAprocMap[kggZZ]        =TVar::GGZZ_4l;
+
+    /// Mapping between MEMs process enums and MELA production enums 
+    /// - initialisation (to be updated)
+    MELAprodMap[kSMHiggs]     =TVar::GG;
+    MELAprodMap[k0hplus]      =TVar::GG;
+    MELAprodMap[k0minus]      =TVar::GG;
+    MELAprodMap[k1plus]       =TVar::QQB;
+    MELAprodMap[k1minus]      =TVar::QQB;
+    MELAprodMap[k2mplus_gg]   =TVar::GG;
+    MELAprodMap[k2mplus_qqbar]=TVar::QQB;
+    MELAprodMap[k2hplus]      =TVar::GG;
+    MELAprodMap[k2hminus]     =TVar::GG;
+    MELAprodMap[k2bplus]      =TVar::GG;
+    MELAprodMap[kqqZZ]        =TVar::QQB;
+    MELAprodMap[kggZZ]        =TVar::GG;
+
+    /// Mapping between MEMs calculator enums and MELA MatrixElement enums 
+    /// - initialisation (to be updated)
+    MELAcalcMap[kMCFM]     =TVar::MCFM;
+    MELAcalcMap[kJHUGen]      =TVar::JHUGen;
+    MELAcalcMap[kAnalytical]      =TVar::ANALYTICAL;
+    MELAcalcMap[kMELA_HCP]      =TVar::ANALYTICAL; 
+    MELAcalcMap[kMEKD]      =TVar::MadGraph; 
+
     debug=debug_;
 
     /// Initialise MEKD
     m_MEKD = new MEKD(collisionEnergy, PDFName);
     /// Initialise MELA
-    m_MELA = new Mela(false, collisionEnergy);
+    m_MELA = new Mela(collisionEnergy);
     
     /// Set some non-physical values for MEs initially
     for(int iMemCalc = 0; iMemCalc < NUM_MEMCALCS; iMemCalc++ )
@@ -66,20 +104,16 @@ int MEMs::computeME(Processes process, MEMCalcs calculator, vector<TLorentzVecto
       //std::cout <<"MEKD: " << m_processNameMEKD[process] << " : " << me2process << std::endl;
       break;
     case kAnalytical:  	  /// compute ME with MELA
-      cacheMELAcalculation(partP,partId); 
-      me2process=m_computedME[process][calculator];
+      return cacheMELAcalculation(process,calculator,partP,partId,me2process); 
       break;
     case kJHUGen:       /// compute ME with JHUGen
-      cacheMELAcalculation(partP,partId); 
-      me2process=m_computedME[process][calculator];
+      return cacheMELAcalculation(process,calculator,partP,partId,me2process); 
       break;	  
     case kMCFM:         /// compute ME with MCFM
-      cacheMELAcalculation(partP,partId); 
-      me2process=m_computedME[process][calculator];
+      return cacheMELAcalculation(process,calculator,partP,partId,me2process);  
       break;	  
     case kMELA_HCP:     /// compute ME with MELA_HCP
-      cacheMELAcalculation(partP,partId); 
-      me2process=m_computedME[process][calculator];
+      return ERR_PROCESS;
       break;
     default:
       return ERR_PROCESS;
@@ -105,28 +139,34 @@ int MEMs::computeKD(Processes processA, Processes processB, MEMCalcs calculator,
             if( (m_MEKD->computeKD(m_processNameMEKD[processA], m_processNameMEKD[processB], partP, partId, kd, me2processA, me2processB)) != 0 ) return ERR_COMPUTE;
             break;
         case kAnalytical:   /// compute KD with MELA
-          cacheMELAcalculation(partP,partId); 
-          me2processA=m_computedME[processA][calculator];
-          me2processB=m_computedME[processB][calculator];
-          kd=me2processA/(me2processA+me2processB);
-          break;
+          if(cacheMELAcalculation(processA,calculator,partP,partId,me2processA) || 
+	     cacheMELAcalculation(processA,calculator,partP,partId,me2processA) )
+	    return ERR_COMPUTE;
+	  else{
+	    kd=me2processA/(me2processA+me2processB);
+	    return NO_ERR;
+	  }
+	  break;
         case kJHUGen:       /// compute KD with JHUGen
-          cacheMELAcalculation(partP,partId); 
-          me2processA=m_computedME[processA][calculator];
-          me2processB=m_computedME[processB][calculator];
-          kd=me2processA/(me2processA+me2processB);
+          if(cacheMELAcalculation(processA,calculator,partP,partId,me2processA) || 
+	     cacheMELAcalculation(processA,calculator,partP,partId,me2processA) )
+	    return ERR_COMPUTE;
+	  else{
+	    kd=me2processA/(me2processA+me2processB);
+	    return NO_ERR;
+	  }
           break;
         case kMCFM:         /// compute KD with MCFM
-          cacheMELAcalculation(partP,partId); 
-          me2processA=m_computedME[processA][calculator];
-          me2processB=m_computedME[processB][calculator];
-          kd=me2processA/(me2processA+me2processB);
+          if(cacheMELAcalculation(processA,calculator,partP,partId,me2processA) || 
+	     cacheMELAcalculation(processA,calculator,partP,partId,me2processA) )
+	    return ERR_COMPUTE;
+	  else{
+	    kd=me2processA/(me2processA+me2processB);
+	    return NO_ERR;
+	  }
           break;
         case kMELA_HCP:         /// compute KD with MCFM
-          cacheMELAcalculation(partP,partId); 
-          me2processA=m_computedME[processA][calculator];
-          me2processB=m_computedME[processB][calculator];
-          kd=me2processA/(me2processA+me2processB);
+	  return ERR_PROCESS;
           break;
         default:
             return ERR_PROCESS;
@@ -259,7 +299,7 @@ double MEMs::probRatio(Processes processA, MEMCalcs calculatorA, Processes proce
 ///----------------------------------------------------------------------------------------------
 /// MEMCalculators::cacheMELAcalculation - method to interface with Mela::computeP and cache results
 ///----------------------------------------------------------------------------------------------
-int  MEMs::cacheMELAcalculation(vector<TLorentzVector> partP, vector<int> partId){
+int  MEMs::cacheMELAcalculation(Processes process, MEMCalcs calculator,vector<TLorentzVector> partP, vector<int> partId,double& me2process){
 
   if(debug)
     std::cout << " MEMs::cacheMELAcalculation " << std::endl;
@@ -276,21 +316,6 @@ int  MEMs::cacheMELAcalculation(vector<TLorentzVector> partP, vector<int> partId
   // ------------------ channel ------------------------
   int flavor;
 
-  if(debug)
-    std::cout << "initializing variables" << std::endl;
-
-  float p0plus_melaNorm,p0plus_mela,p0minus_mela,p0hplus_mela; // analytical spin0 
-  float p1_mela,p1plus_mela; // analytical spin1
-  float p2_mela,p2qqb_mela; // analytical spin2
-  float p0plus_VAJHU,p0minus_VAJHU, p0hplus_VAJHU; // JHUGen spin0 
-  float p0plus_VAMCFM; // MCFM spin0 
-  float p1_VAJHU, p1plus_VAJHU; // JHUGen spin1
-  float p2_VAJHU,p2qqb_VAJHU; // JHUGen spin2
-  float bkg_mela, bkg_VAMCFM,ggzz_VAMCFM,bkg_VAMCFMNorm; // background
-  float p0_pt,p0_y,bkg_pt,bkg_y;                        // rapidity/pt
-  float p0plus_m4l,bkg_m4l; //supermela
-  
-
   if(abs(partId[0])==abs(partId[1])&&
      abs(partId[0])==abs(partId[2])&&
      abs(partId[0])==abs(partId[3])){
@@ -299,6 +324,9 @@ int  MEMs::cacheMELAcalculation(vector<TLorentzVector> partP, vector<int> partId
     else flavor=2;
 
   }else flavor=3;
+
+  if(debug)
+    std::cout << "flavor: "  << flavor << std::endl;
 
   // ---------------------------------------------------
   // ---------- COMPUTE ANGLES and MASSES --------------
@@ -313,6 +341,7 @@ int  MEMs::cacheMELAcalculation(vector<TLorentzVector> partP, vector<int> partId
 		      partP[2], partId[2], partP[3], partId[3],
 		      costhetastar,costheta1,costheta2,phi,phi1);
 
+  // protections against NaNs, return ERR_COMPUTE and skip ME calc
   if(TMath::IsNaN(costhetastar)||
      TMath::IsNaN(costhetastar)||
      TMath::IsNaN(costhetastar)||
@@ -341,44 +370,27 @@ int  MEMs::cacheMELAcalculation(vector<TLorentzVector> partP, vector<int> partId
     std::cout << "Y4l: " << Y4l << std::endl;
   }
 
+  // retrieve ME calculations
   // ---------------------------------------------------
+
+  float temp;
+  //                 TVar::Process        TVar::MatrixElement     TVar::Production
+  m_MELA->setProcess(MELAprocMap[process],MELAcalcMap[calculator],MELAprodMap[process]);
+
+  // check if ZZ_4e is configured and event is 2e2mu event
+  if(MELAprocMap[process]==TVar::ZZ_4e && MELAcalcMap[calculator]==TVar::MCFM && flavor==3)
+    m_MELA->setProcess(TVar::ZZ_2e2m,MELAcalcMap[calculator],MELAprodMap[process]);
+
   m_MELA->computeP(mzz, m1, m2,
 		   costhetastar,costheta1,costheta2,phi,phi1,
-		   //signal probabilities
-		   p0plus_melaNorm,   // higgs, analytic distribution, normalized
-		   p0plus_mela,   // higgs, analytic distribution
-		   p0minus_mela,  // pseudoscalar, analytic distribution
-		   p0hplus_mela,  // pseudoscalar, analytic distribution
-		   p0plus_VAJHU,  // higgs, vector algebra, JHUgen
-		   p0minus_VAJHU, // pseudoscalar, vector algebra, JHUgen
-		   p0plus_VAMCFM,// higgs, vector algebra, MCFM
-		   p0hplus_VAJHU, // 0h+ (high dimensional operator), vector algebra, JHUgen
-		   p1_mela,  // zprime, analytic distribution
-		   p1plus_mela,  // zprime, analytic distribution
-		   p1_VAJHU, // zprime, vector algebra, JHUgen,
-		   p1plus_VAJHU, // 1+ (axial vector), vector algebra, JHUgen,
-		   p2_mela , // graviton, analytic distribution,
-		   p2qqb_mela , // graviton, analytic distribution,
-		   p2_VAJHU, // graviton, vector algebra, JHUgen,
-		   p2qqb_VAJHU, // graviton produced by qqbar, vector algebra, JHUgen,
-		   //backgrounds
-		   bkg_mela,  // background,  analytic distribution,
-		   bkg_VAMCFM, // background, vector algebra, MCFM,
-		   ggzz_VAMCFM, // background, vector algebra, MCFM for ggzz,
-		   bkg_VAMCFMNorm, // background, vector algebra, MCFM,
-		   //pt/rapidity
-		   p0_pt, // multiplicative probability for signal pt,
-		   p0_y, // multiplicative probability for signal y,
-		   bkg_pt, // multiplicative probability for bkg pt,
-		   bkg_y, // multiplicative probability for bkg y,
-		   // supermela
-		   p0plus_m4l,  // signal m4l probability as in datacards,
-		   bkg_m4l,     // backgroun m4l probability as in datacards,
-		   //optional input parameters
-		   pt4l,Y4l,flavor // 1:4e, 2:4mu, 3:2e2mu (for interference effects)
-		   );
+		   flavor,
+		   temp);
 
-    /// Add weight calculation
+  me2process = (double) temp;
+  
+  /* --------------
+
+  /// Add weight calculation
   m_MELA->computeWeight(mzz, m1,  m2,
                         costhetastar,
                         costheta1,
@@ -388,42 +400,7 @@ int  MEMs::cacheMELAcalculation(vector<TLorentzVector> partP, vector<int> partId
                         // return variables:
                         m_weight);
 
-  if(debug)
-    std::cout << "got MEs" << std::endl;
-
-  m_computedME[kSMHiggs][kAnalytical]      = p0plus_mela;
-  m_computedME[k0minus][kAnalytical]       = p0minus_mela;
-  m_computedME[k0hplus][kAnalytical]       = p0hplus_mela;
-  m_computedME[k1minus][kAnalytical]       = p1_mela;
-  m_computedME[k1plus][kAnalytical]        = p1plus_mela;
-  m_computedME[k2mplus_gg][kAnalytical]    = p2_mela;
-  m_computedME[k2mplus_qqbar][kAnalytical] = p2qqb_mela;
-  m_computedME[k2mplus_qqbar][kAnalytical] = p2qqb_mela;
-  m_computedME[k2hplus][kAnalytical]       = -99;
-  m_computedME[k2hminus][kAnalytical]      = -99;
-  m_computedME[k2bplus][kAnalytical]       = -99;
-
-  m_computedME[kqqZZ][kAnalytical]         = bkg_mela;
-  
-  m_computedME[kSMHiggs][kJHUGen]       = p0plus_VAJHU;
-  m_computedME[k0minus][kJHUGen]        = p0minus_VAJHU;
-  m_computedME[k0hplus][kJHUGen]        = p0hplus_VAJHU;
-  m_computedME[k1minus][kJHUGen]        = p1_VAJHU;
-  m_computedME[k1plus][kJHUGen]         = p1plus_VAJHU;
-  m_computedME[k2mplus_gg][kJHUGen]     = p2_VAJHU;
-  m_computedME[k2mplus_qqbar][kJHUGen]  = p2qqb_VAJHU;
-  m_computedME[k2hplus][kJHUGen]        = -99;
-  m_computedME[k2hminus][kJHUGen]       = -99;
-  m_computedME[k2bplus][kJHUGen]        = -99;
-
-  m_computedME[kSMHiggs][kMCFM]         = p0plus_VAMCFM;
-  m_computedME[kqqZZ][kMCFM]            = bkg_VAMCFM;
-  m_computedME[kggZZ][kMCFM]            = ggzz_VAMCFM;
-
-  m_computedME[kSMHiggs][kMELA_HCP]         = p0plus_melaNorm;
-  m_computedME[kqqZZ][kMELA_HCP]            = bkg_mela;
-
-  qqZZ_MCFMNorm = bkg_VAMCFMNorm;
+  ---------------- */
 
   if(debug)
     std::cout << "Done!" << std::endl;
