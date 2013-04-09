@@ -392,6 +392,11 @@ void  MEMs::cacheMELAcalculation(vector<TLorentzVector> partP, vector<int> partI
   m_computedME[k1plus][kAnalytical]        = p1plus_mela;
   m_computedME[k2mplus_gg][kAnalytical]    = p2_mela;
   m_computedME[k2mplus_qqbar][kAnalytical] = p2qqb_mela;
+  m_computedME[k2mplus_qqbar][kAnalytical] = p2qqb_mela;
+  m_computedME[k2hplus][kAnalytical]       = -99;
+  m_computedME[k2hminus][kAnalytical]      = -99;
+  m_computedME[k2bplus][kAnalytical]       = -99;
+
   m_computedME[kqqZZ][kAnalytical]         = bkg_mela;
   
   m_computedME[kSMHiggs][kJHUGen]       = p0plus_VAJHU;
@@ -401,6 +406,9 @@ void  MEMs::cacheMELAcalculation(vector<TLorentzVector> partP, vector<int> partI
   m_computedME[k1plus][kJHUGen]         = p1plus_VAJHU;
   m_computedME[k2mplus_gg][kJHUGen]     = p2_VAJHU;
   m_computedME[k2mplus_qqbar][kJHUGen]  = p2qqb_VAJHU;
+  m_computedME[k2hplus][kJHUGen]        = -99;
+  m_computedME[k2hminus][kJHUGen]       = -99;
+  m_computedME[k2bplus][kJHUGen]        = -99;
 
   m_computedME[kSMHiggs][kMCFM]         = p0plus_VAMCFM;
   m_computedME[kqqZZ][kMCFM]            = bkg_VAMCFM;
