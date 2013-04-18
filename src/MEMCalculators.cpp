@@ -107,7 +107,7 @@ int MEMs::computeME(Processes process, MEMCalcs calculator, vector<TLorentzVecto
       return cacheMELAcalculation(process,calculator,partP,partId,me2process); 
       break;
     case kJHUGen:       /// compute ME with JHUGen
-      return cacheMELAcalculation(process,calculator,partP,partId,me2process); 
+      return cacheMELAcalculation(process,calculator,partP,partId,me2process);
       break;	  
     case kMCFM:         /// compute ME with MCFM
       return cacheMELAcalculation(process,calculator,partP,partId,me2process);  
@@ -303,9 +303,6 @@ int  MEMs::cacheMELAcalculation(Processes process, MEMCalcs calculator,vector<TL
 
   if(debug)
     std::cout << " MEMs::cacheMELAcalculation " << std::endl;
-  
-  if( partPCache==partP &&  partIdCache==partId) // do nothing if we have already processed these
-    return NO_ERR;
 
   partPCache = partP;
   partIdCache = partId;
@@ -388,6 +385,8 @@ int  MEMs::cacheMELAcalculation(Processes process, MEMCalcs calculator,vector<TL
 
   me2process = (double) temp;
   
+  if(debug) cout << "MEMs::cacheMELACalculation - me2process: " << me2process << endl;
+
   /* --------------
 
   /// Add weight calculation
