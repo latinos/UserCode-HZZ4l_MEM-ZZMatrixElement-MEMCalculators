@@ -35,40 +35,46 @@ MEMs::MEMs(double collisionEnergy, string PDFName, bool debug_)
 
     /// Mapping between MEMs process enums and MELA process enums 
     /// - initialisation (to be updated)
-    MELAprocMap[kSMHiggs]     =TVar::HZZ_4l;
-    MELAprocMap[k0hplus]      =TVar::HDHZZ_4l;
-    MELAprocMap[k0minus]      =TVar::PSHZZ_4l;
-    MELAprocMap[k1plus]       =TVar::AVZZ_4l;
-    MELAprocMap[k1minus]      =TVar::VZZ_4l;
-    MELAprocMap[k2mplus_gg]   =TVar::TZZ_4l;
-    MELAprocMap[k2mplus_qqbar]=TVar::TZZ_4l;
-    MELAprocMap[k2hplus]      =TVar::TZZ_2hplus_4l;
-    MELAprocMap[k2hminus]     =TVar::PTZZ_2hminus_4l;
-    MELAprocMap[k2bplus]      =TVar::TZZ_2bplus_4l;
-    MELAprocMap[kqqZZ]        =TVar::ZZ_4e;
-    MELAprocMap[kggZZ]        =TVar::GGZZ_4l;
+    MELAprocMap[kSMHiggs]         =TVar::HZZ_4l;
+    MELAprocMap[k0hplus]          =TVar::HDHZZ_4l;
+    MELAprocMap[k0minus]          =TVar::PSHZZ_4l;
+    MELAprocMap[k1plus]           =TVar::AVZZ_4l;
+    MELAprocMap[k1plus_prodIndep] =TVar::AVZZ_4l;
+    MELAprocMap[k1minus]          =TVar::VZZ_4l;
+    MELAprocMap[k1minus_prodIndep]=TVar::VZZ_4l;
+    MELAprocMap[k2mplus_gg]       =TVar::TZZ_4l;
+    MELAprocMap[k2mplus_qqbar]    =TVar::TZZ_4l;
+    MELAprocMap[k2mplus_prodIndep]=TVar::TZZ_4l;
+    MELAprocMap[k2hplus]          =TVar::TZZ_2hplus_4l;
+    MELAprocMap[k2hminus]         =TVar::PTZZ_2hminus_4l;
+    MELAprocMap[k2bplus]          =TVar::TZZ_2bplus_4l;
+    MELAprocMap[kqqZZ]            =TVar::ZZ_4e;
+    MELAprocMap[kggZZ]            =TVar::GGZZ_4l;
 
     /// Mapping between MEMs process enums and MELA production enums 
     /// - initialisation (to be updated)
-    MELAprodMap[kSMHiggs]     =TVar::GG;
-    MELAprodMap[k0hplus]      =TVar::GG;
-    MELAprodMap[k0minus]      =TVar::GG;
-    MELAprodMap[k1plus]       =TVar::QQB;
-    MELAprodMap[k1minus]      =TVar::QQB;
-    MELAprodMap[k2mplus_gg]   =TVar::GG;
-    MELAprodMap[k2mplus_qqbar]=TVar::QQB;
-    MELAprodMap[k2hplus]      =TVar::GG;
-    MELAprodMap[k2hminus]     =TVar::GG;
-    MELAprodMap[k2bplus]      =TVar::GG;
-    MELAprodMap[kqqZZ]        =TVar::QQB;
-    MELAprodMap[kggZZ]        =TVar::GG;
+    MELAprodMap[kSMHiggs]         =TVar::GG;
+    MELAprodMap[k0hplus]          =TVar::GG;
+    MELAprodMap[k0minus]          =TVar::GG;
+    MELAprodMap[k1plus]           =TVar::QQB;
+    MELAprodMap[k1plus_prodIndep] =TVar::INDEPENDENT;
+    MELAprodMap[k1minus]          =TVar::QQB;
+    MELAprodMap[k1minus_prodIndep]=TVar::INDEPENDENT;
+    MELAprodMap[k2mplus_gg]       =TVar::GG;
+    MELAprodMap[k2mplus_qqbar]    =TVar::QQB;
+    MELAprodMap[k2mplus_prodIndep]=TVar::INDEPENDENT;
+    MELAprodMap[k2hplus]          =TVar::GG;
+    MELAprodMap[k2hminus]         =TVar::GG;
+    MELAprodMap[k2bplus]          =TVar::GG;
+    MELAprodMap[kqqZZ]            =TVar::QQB;
+    MELAprodMap[kggZZ]            =TVar::GG;
 
     /// Mapping between MEMs calculator enums and MELA MatrixElement enums 
     /// - initialisation (to be updated)
-    MELAcalcMap[kMCFM]     =TVar::MCFM;
-    MELAcalcMap[kJHUGen]      =TVar::JHUGen;
-    MELAcalcMap[kAnalytical]      =TVar::ANALYTICAL;
-    MELAcalcMap[kMELA_HCP]      =TVar::ANALYTICAL; 
+    MELAcalcMap[kMCFM]      =TVar::MCFM;
+    MELAcalcMap[kJHUGen]    =TVar::JHUGen;
+    MELAcalcMap[kAnalytical]=TVar::ANALYTICAL;
+    MELAcalcMap[kMELA_HCP]  =TVar::ANALYTICAL; 
     MELAcalcMap[kMEKD]      =TVar::MadGraph; 
 
     debug=debug_;
@@ -93,10 +99,16 @@ MEMs::MEMs(double collisionEnergy, string PDFName, bool debug_)
 int MEMs::computeME(Processes process, MEMCalcs calculator, vector<TLorentzVector> partP, vector<int> partId, double& me2process)
 {
 
+  if(debug)
+    std::cout << "MEMs::computeME" << std::endl;
+
   //std::cout << m_processNameMEKD[process] << " " << calculator <<std::endl;
     /// check if process is supported
     if (!isProcSupported[process][calculator]) return ERR_PROCESS;
     
+    if(debug)
+      std::cout << "process is supported!" << endl;
+
     /// perform computation according to the specified process and MEM package
     switch ( calculator ) {
     case kMEKD:         /// compute ME with MEKD
@@ -104,18 +116,26 @@ int MEMs::computeME(Processes process, MEMCalcs calculator, vector<TLorentzVecto
       //std::cout <<"MEKD: " << m_processNameMEKD[process] << " : " << me2process << std::endl;
       break;
     case kAnalytical:  	  /// compute ME with MELA
+      if(debug)
+	std::cout << "Analytical -> process: " << process << std::endl;
       return cacheMELAcalculation(process,calculator,partP,partId,me2process); 
       break;
     case kJHUGen:       /// compute ME with JHUGen
+      if(debug)
+	std::cout << "JHUGen -> process: " << process << std::endl;
       return cacheMELAcalculation(process,calculator,partP,partId,me2process);
       break;	  
     case kMCFM:         /// compute ME with MCFM
       return cacheMELAcalculation(process,calculator,partP,partId,me2process);  
       break;	  
     case kMELA_HCP:     /// compute ME with MELA_HCP
+      if(debug)
+	std::cout << "MELA_HCP -> process: " << process << std::endl;
       return ERR_PROCESS;
       break;
     default:
+      if(debug)
+	std::cout << " default case hit... don't recognize calculator" << std::endl;
       return ERR_PROCESS;
       break;
     }
@@ -131,7 +151,7 @@ int MEMs::computeKD(Processes processA, Processes processB, MEMCalcs calculator,
     /// check if processes are supported
     if (!isProcSupported[processA][calculator]) return ERR_PROCESS;
     if (!isProcSupported[processB][calculator]) return ERR_PROCESS;
-    
+
     /// perform computation according to the specified process and MEM package
     switch ( calculator ) {
     case kMEKD:         /// compute KD with MEKD
@@ -301,8 +321,11 @@ double MEMs::probRatio(Processes processA, MEMCalcs calculatorA, Processes proce
 ///----------------------------------------------------------------------------------------------
 int  MEMs::cacheMELAcalculation(Processes process, MEMCalcs calculator,vector<TLorentzVector> partP, vector<int> partId,double& me2process){
 
-  if(debug)
+  if(debug){
     std::cout << " MEMs::cacheMELAcalculation " << std::endl;
+    std::cout << " process: " << process << std::endl;
+    std::cout << " calculator: " << calculator << std::endl;
+  }
 
   partPCache = partP;
   partIdCache = partId;
@@ -370,7 +393,7 @@ int  MEMs::cacheMELAcalculation(Processes process, MEMCalcs calculator,vector<TL
   // retrieve ME calculations
   // ---------------------------------------------------
 
-  float temp;
+  float me2process_float;
   //                 TVar::Process        TVar::MatrixElement     TVar::Production
   m_MELA->setProcess(MELAprocMap[process],MELAcalcMap[calculator],MELAprodMap[process]);
 
@@ -381,13 +404,11 @@ int  MEMs::cacheMELAcalculation(Processes process, MEMCalcs calculator,vector<TL
   m_MELA->computeP(mzz, m1, m2,
 		   costhetastar,costheta1,costheta2,phi,phi1,
 		   flavor,
-		   temp);
+		   me2process_float);
 
-  me2process = (double) temp;
+  me2process = (double) me2process_float;
   
   if(debug) cout << "MEMs::cacheMELACalculation - me2process: " << me2process << endl;
-
-  /* --------------
 
   /// Add weight calculation
   m_MELA->computeWeight(mzz, m1,  m2,
@@ -398,8 +419,6 @@ int  MEMs::cacheMELAcalculation(Processes process, MEMCalcs calculator,vector<TL
                         phi1,
                         // return variables:
                         m_weight);
-
-  ---------------- */
 
   if(debug)
     std::cout << "Done!" << std::endl;

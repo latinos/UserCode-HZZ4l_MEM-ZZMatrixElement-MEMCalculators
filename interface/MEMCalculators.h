@@ -36,7 +36,7 @@ using namespace std;
 //////////////////////////////////////////////////////////////////////////
 namespace MEMNames {
     /// Enum type for supported processes in MELA and MEKD packages
-    enum Processes    {kSMHiggs, k0hplus, k0minus, k1plus, k1minus, k2mplus_gg, k2mplus_qqbar, k2mkqqZZ, k2hplus, k2hminus, k2bplus, kqqZZ, kggZZ, NUM_PROCESSES};
+  enum Processes    {kSMHiggs, k0hplus, k0minus, k1plus,k1plus_prodIndep, k1minus,k1minus_prodIndep, k2mplus_gg, k2mplus_qqbar,k2mplus_prodIndep, k2hplus, k2hminus, k2bplus, kqqZZ,kqqZZ_prodIndep, kggZZ, NUM_PROCESSES};
   
     /// Enum type for supported MEM calculators from MELA and MEKD packages
     enum MEMCalcs    {kAnalytical, kMEKD, kJHUGen, kMCFM, kMELA_HCP, NUM_MEMCALCS};
@@ -207,13 +207,17 @@ const bool MEMs::isProcSupported[MEMNames::NUM_PROCESSES][MEMNames::NUM_MEMCALCS
   {1,            1,          1,          0,          0},      // k0hplus
   {1,            1,          1,          0,          0},      // k0minus
   {1,            1,          1,          0,          0},      // k1plus
+  {1,            0,          1,          0,          0},      // k1plus_prodIndep
   {1,            1,          1,          0,          0},      // k1minus
+  {1,            0,          1,          0,          0},      // k1minus_prodIndep
   {1,            1,          1,          0,          0},      // k2mplus_gg
   {1,            1,          1,          0,          0},      // k2mplus_qqbar
+  {1,            0,          1,          0,          0},      // k2mplus_prodIndep
   {1,            0,          1,          0,          0},      // k2hplus 
   {1,            0,          1,          0,          0},      // k2hminus 
   {1,            0,          1,          0,          0},      // k2bplus 
   {1,            1,          0,          1,          1},      // kqqZZ
+  {1,            0,          0,          1,          0},      // kqqZZ_prodIndep
   {0,            0,          0,          1,          0}};     // kggZZ
 
 //////////////////////////////////////////////////////////////////////////
