@@ -25,7 +25,7 @@ using namespace MEMNames;
 
 
 /// MEKD process name translation - initialisation (to be updated)
-const TString MEMs::m_processNameMEKD[MEMNames::NUM_PROCESSES] = {"SMHiggs", "Spin0PH", "Higgs0M", "Spin1P", "Spin1M", "Graviton2PM", "qqGraviton2PM", "ZZ", ""};
+const TString MEMs::m_processNameMEKD[MEMNames::NUM_PROCESSES] = {"SMHiggs", "Spin0PH", "Higgs0M", "Spin1P", "", "Spin1M", "", "Graviton2PM", "qqGraviton2PM", "", "ggSpin2Ph", "ggSpin2Mh", "ggSpin2Pb", "ZZ", "", ""};
 
 ///----------------------------------------------------------------------------------------------
 /// MEMs::MEMs - constructor
@@ -296,14 +296,14 @@ double MEMs::probRatio(Processes processA, MEMCalcs calculatorA, Processes proce
             c = 1.; // for JHUGen or MEKD when 0+ vs 2m+
         }else if ( processB==kqqZZ ){
             c = 1.;
-            me2processB = qqZZ_MCFMNorm; // qqZZ_MCFMNorm/qqZZ_MCFM should be used for (JHUGen or MEKD) signal vs MEKD bkg
+//            me2processB = qqZZ_MCFMNorm; // qqZZ_MCFMNorm/qqZZ_MCFM should be used for (JHUGen or MEKD) signal vs MEKD bkg
         }else{
             c = 1.; // default for all "non-known" cases
         }
     }else if( (calculatorA==kJHUGen || calculatorA==kMEKD) && (calculatorB==kMCFM) ){ // (JHUGen or MEKD) vs. MCFM
         if( processB==kqqZZ ){
             c = 1.;
-            me2processB = qqZZ_MCFMNorm; // qqZZ_MCFMNorm/qqZZ_MCFM should be used for (JHUGen or MEKD) signal vs MCFM bkg
+//            me2processB = qqZZ_MCFMNorm; // qqZZ_MCFMNorm/qqZZ_MCFM should be used for (JHUGen or MEKD) signal vs MCFM bkg
         }else{
             c = 1.; // default for all "non-known" cases
         }
