@@ -213,9 +213,9 @@ const bool MEMs::isProcSupported[MEMNames::NUM_PROCESSES][MEMNames::NUM_MEMCALCS
   {1,            1,          1,          0,          0},      // k2mplus_gg
   {1,            1,          1,          0,          0},      // k2mplus_qqbar
   {1,            0,          1,          0,          0},      // k2mplus_prodIndep
-  {1,            0,          1,          0,          0},      // k2hplus 
-  {1,            0,          1,          0,          0},      // k2hminus 
-  {1,            0,          1,          0,          0},      // k2bplus 
+  {1,            1,          1,          0,          0},      // k2hplus
+  {1,            1,          1,          0,          0},      // k2hminus
+  {1,            1,          1,          0,          0},      // k2bplus
   {1,            1,          0,          1,          1},      // kqqZZ
   {1,            0,          0,          1,          0},      // kqqZZ_prodIndep
   {0,            0,          0,          1,          0}};     // kggZZ
