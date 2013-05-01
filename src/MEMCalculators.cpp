@@ -49,6 +49,7 @@ MEMs::MEMs(double collisionEnergy, string PDFName, bool debug_)
     MELAprocMap[k2hminus]         =TVar::PTZZ_2hminus_4l;
     MELAprocMap[k2bplus]          =TVar::TZZ_2bplus_4l;
     MELAprocMap[kqqZZ]            =TVar::ZZ_4e;
+    MELAprocMap[kqqZZ_prodIndep   =TVar::ZZ_4e;
     MELAprocMap[kggZZ]            =TVar::GGZZ_4l;
 
     /// Mapping between MEMs process enums and MELA production enums 
@@ -67,6 +68,7 @@ MEMs::MEMs(double collisionEnergy, string PDFName, bool debug_)
     MELAprodMap[k2hminus]         =TVar::GG;
     MELAprodMap[k2bplus]          =TVar::GG;
     MELAprodMap[kqqZZ]            =TVar::QQB;
+    MELAprodMap[kqqZZ_prodIndep]  =TVar::INDEPENDENT;
     MELAprodMap[kggZZ]            =TVar::GG;
 
     /// Mapping between MEMs calculator enums and MELA MatrixElement enums 
