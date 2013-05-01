@@ -427,4 +427,50 @@ int  MEMs::cacheMELAcalculation(Processes process, MEMCalcs calculator,vector<TL
 
 }  
 
+//////////////////////////////////////////////////////////////////////////
+///----------------------------------------------------------------------------------------------
+/// interface for calculating P(m4l) for superKD 
+/// syst controls whether PDF mean or width is adjusted
+/// to gauge systematic effects
+/// process: should be either kSMHiggs or kqqZZ else ERR_PROCESS
+/// partP: 4-momentum of leptons (with photons added)
+/// partId: PDG Id of leptons
+/// TVar::SMSyst_None: nominal shape is used
+/// TVar::SMSyst_ScaleUp/SMSyst_ScaleDown: mean mass shifted up/down 1 GeV
+/// TVar::kResUp/kResDown: width is varied by... ??
+
+/// sigProb: variable return with P(m4l) for signal
+/// bkgProb: variable return with P(m4l) for background
+///----------------------------------------------------------------------------------------------
+
+void MEMs::computePm4l(vector<TLorentzVector> partP, 
+		  vector<int> partId,
+		  TVar::SuperMelaSyst syst,
+		  double& sigProb,
+		  double& bkgProb){
+  
+  float prob_float;
+
+  m_MELA->setProcess(TVar::SummedBackgrounds,TVar::JHUGen,TVar::GG);
+
+  m_MELA->computePM4l(partP[0],partId[0],
+		      partP[1],partId[1],
+		      partP[2],partId[2],
+		      partP[3],partId[3],
+		      syst,prob_float);
+
+  bkgProb = (double) prob_float;
+
+  m_MELA->setProcess(TVar::HZZ_4l,TVar::JHUGen,TVar::GG);
+
+  m_MELA->computePM4l(partP[0],partId[0],
+		      partP[1],partId[1],
+		      partP[2],partId[2],
+		      partP[3],partId[3],
+		      syst,prob_float);
+
+  sigProb = (double) prob_float;
+
+}
+
 #endif

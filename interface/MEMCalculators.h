@@ -38,8 +38,10 @@ namespace MEMNames {
     /// Enum type for supported processes in MELA and MEKD packages
   enum Processes    {kSMHiggs, k0hplus, k0minus, k1plus,k1plus_prodIndep, k1minus,k1minus_prodIndep, k2mplus_gg, k2mplus_qqbar,k2mplus_prodIndep, k2hplus, k2hminus, k2bplus, kqqZZ,kqqZZ_prodIndep, kggZZ, NUM_PROCESSES};
   
-    /// Enum type for supported MEM calculators from MELA and MEKD packages
-    enum MEMCalcs    {kAnalytical, kMEKD, kJHUGen, kMCFM, kMELA_HCP, NUM_MEMCALCS};
+  /// Enum type for supported MEM calculators from MELA and MEKD packages
+  enum MEMCalcs    {kAnalytical, kMEKD, kJHUGen, kMCFM, kMELA_HCP, NUM_MEMCALCS};
+
+  enum SuperKDsyst {kNone, kScaleUp, kScaleDown, kResolUp, kResolDown, NUM_SuperKDsyst};
         
 }
 
@@ -153,6 +155,13 @@ public:
     ///
     double getMELAWeight() { return m_weight;}
 
+    /// interface for calculating P(m4l) for superKD
+    void computePm4l(vector<TLorentzVector> partP, 
+		     vector<int> partId,
+		     TVar::SuperMelaSyst syst,
+		     double& sigProb,
+		     double& bkgProb);
+
     /// Simple KD function: kd = log(me2processA / me2processB).
     double logRatio(double me2processA, double me2processB);
     
@@ -188,7 +197,7 @@ private:
     float m_weight;
 
     
-    /// cache MELA calculiation from old interface
+    /// MELA calculation
     int cacheMELAcalculation(Processes process, MEMCalcs calculator,vector<TLorentzVector> partP, vector<int> partId,double& me2process);
 
     /// for calculating JHUGen/MCFM signal vs background KD
