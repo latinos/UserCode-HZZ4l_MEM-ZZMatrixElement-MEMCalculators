@@ -432,7 +432,7 @@ int  MEMs::cacheMELAcalculation(Processes process, MEMCalcs calculator,vector<TL
 /// interface for calculating P(m4l) for superKD
 void MEMs::computePm4l(vector<TLorentzVector> partP, 
 		  vector<int> partId,
-		  TVar::SuperMelaSyst syst,
+		  SuperKDsyst syst,
 		  double& sigProb,
 		  double& bkgProb){
   
@@ -444,7 +444,7 @@ void MEMs::computePm4l(vector<TLorentzVector> partP,
 		      partP[1],partId[1],
 		      partP[2],partId[2],
 		      partP[3],partId[3],
-		      syst,prob_float);
+		      (TVar::SuperMelaSyst)syst,prob_float);
 
   bkgProb = (double) prob_float;
 
@@ -454,7 +454,7 @@ void MEMs::computePm4l(vector<TLorentzVector> partP,
 		      partP[1],partId[1],
 		      partP[2],partId[2],
 		      partP[3],partId[3],
-		      syst,prob_float);
+		      (TVar::SuperMelaSyst)syst,prob_float);
 
   sigProb = (double) prob_float;
 
