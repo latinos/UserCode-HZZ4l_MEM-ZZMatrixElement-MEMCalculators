@@ -154,8 +154,22 @@ public:
     /// \return                                 interference reweighting factor for the given event.
     ///
     double getMELAWeight() { return m_weight;}
-
-    /// interface for calculating P(m4l) for superKD
+    
+    //////////////////////////////////////////////////////////////////////////
+    ///----------------------------------------------------------------------------------------------
+    /// interface for calculating P(m4l) for superKD 
+    /// syst controls whether PDF mean or width is adjusted
+    /// to gauge systematic effects
+    /// process: should be either kSMHiggs or kqqZZ else ERR_PROCESS
+    /// partP: 4-momentum of leptons (with photons added)
+    /// partId: PDG Id of leptons
+    /// TVar::SMSyst_None: nominal shape is used
+    /// TVar::SMSyst_ScaleUp/SMSyst_ScaleDown: mean mass shifted up/down 1 GeV
+    /// TVar::kResUp/kResDown: width is varied by... ??
+    
+    /// sigProb: variable return with P(m4l) for signal
+    /// bkgProb: variable return with P(m4l) for background
+    ///----------------------------------------------------------------------------------------------
     void computePm4l(vector<TLorentzVector> partP, 
 		     vector<int> partId,
 		     TVar::SuperMelaSyst syst,
