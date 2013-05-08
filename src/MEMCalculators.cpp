@@ -212,8 +212,23 @@ int MEMs::computeMEs(vector<TLorentzVector> partP, vector<int> partId)
             m_computedME[iProcess][iMemCalc] = me2process;
         }
     }
-    //return NO_ERR only if all computations were successful
+    // compute and store the sig. and bkg. pdf(m4l) values for all systs
+    computePm4ls(partP, partId);
+    //return NO_ERR only if all ME computations were successful
     return returnERR;
+}
+
+///----------------------------------------------------------------------------------------------
+/// MEMs::computePm4ls - Compute pdf(m4l) with computePm4l(...) for all systs
+///----------------------------------------------------------------------------------------------
+void MEMs::computePm4ls(vector<TLorentzVector> partP, vector<int> partId)
+{
+    for(int iSuperKDsyst = 0; iSuperKDsyst < NUM_SuperKDsyst; iSuperKDsyst++ ) {
+        double sigProb, bkgProb;
+        computePm4l(partP, partId, static_cast<SuperKDsyst>(iSuperKDsyst), sigProb, bkgProb);
+        m_computedPm4lSig[iSuperKDsyst] = sigProb;
+        m_computedPm4lBkg[iSuperKDsyst] = bkgProb;
+    }
 }
 
 ///----------------------------------------------------------------------------------------------
@@ -262,6 +277,25 @@ int MEMs::computeKD(Processes processA, MEMCalcs calculatorA, Processes processB
     /// compute KD
     kd = (*this.*funcKD)(processA, calculatorA, processB, calculatorB);
     
+    return NO_ERR;
+}
+
+///----------------------------------------------------------------------------------------------
+/// MEMs::computeKD - Compute KD for process A and process B with pdf(m4l) folded in.
+///----------------------------------------------------------------------------------------------
+int MEMs::computeKD(Processes processA, MEMCalcs calculatorA, Processes processB, MEMCalcs calculatorB, double (MEMs::*funcKD)(double, double, SuperKDsyst), double& kd, double& me2processA, double& me2processB, SuperKDsyst syst )
+{
+    /// check if processes are supported
+    if (!isProcSupported[processA][calculatorA]) return ERR_PROCESS;
+    if (!isProcSupported[processB][calculatorB]) return ERR_PROCESS;
+    /// check if processB is kqqZZ or kqqZZ_prodIndep
+    if (processB != kqqZZ && processB != kqqZZ_prodIndep ) return ERR_PROCESS;
+
+    //// compute KD with pdf(m4l) folded in
+    me2processA = m_computedME[processA][calculatorA];
+    me2processB = m_computedME[processB][calculatorB];
+    kd = (*this.*funcKD)(me2processA, me2processB, syst);
+
     return NO_ERR;
 }
 
@@ -315,6 +349,15 @@ double MEMs::probRatio(Processes processA, MEMCalcs calculatorA, Processes proce
     
     if (me2processA + c * me2processB == 0) return -999.;
     return me2processA/( me2processA + c * me2processB );
+}
+
+///----------------------------------------------------------------------------------------------
+/// MEMs::PDFm4lRatio - KD function: Pm4lSig * me2sig / ( Pm4lSig * me2sig + Pm4lBkg * me2bkg )
+///----------------------------------------------------------------------------------------------
+double MEMs::PDFm4lRatio(double me2processA, double me2processB, SuperKDsyst syst)
+{
+    if (m_computedPm4lSig[syst] * me2processA + m_computedPm4lBkg[syst] * me2processB == 0) return -999.;
+    return m_computedPm4lSig[syst]*me2processA/( m_computedPm4lSig[syst] * me2processA + m_computedPm4lBkg[syst] * me2processB );
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -429,8 +472,16 @@ int  MEMs::cacheMELAcalculation(Processes process, MEMCalcs calculator,vector<TL
 
 }  
 
+///----------------------------------------------------------------------------------------------
 /// interface for calculating P(m4l) for superKD
-void MEMs::computePm4l(vector<TLorentzVector> partP, 
+///----------------------------------------------------------------------------------------------
+/// Possible syst values:
+///   kNone: nominal shape is used
+///   kScaleUp/kScaleDown: mean mass shifted up/down appropriate scale error
+///   kResolUp/kResolDown: width is varied by appropriate resolution error
+///----------------------------------------------------------------------------------------------
+//////////////////////////////////////////////////////////////////////////
+void MEMs::computePm4l(vector<TLorentzVector> partP,
 		  vector<int> partId,
 		  SuperKDsyst syst,
 		  double& sigProb,

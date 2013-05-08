@@ -147,6 +147,23 @@ public:
     int computeKD(Processes processA, MEMCalcs calculatorA, Processes processB, MEMCalcs calculatorB, double (MEMs::*funcKD)(Processes, MEMCalcs, Processes, MEMCalcs), double& kd, double& me2processA, double& me2processB );
 
     ///
+    /// Compute KD with pdf(m4l) folded in and retrieve MEs for process A (signal) and process B (background), obtained with the specified calculator tool.
+    /// The KD is computed using KD function specified by the user as kd = funcKD(me2processA, me2processB, syst).
+    ///
+    /// Method should be called only after running computeMEs(vector<TLorentzVector> partP,vector<int> partId).
+    ///
+    /// \param[in]  processA, processB          names of the processes for which the KD and MEs are computed (processB must be kqqZZ or kqqZZ_prodIndep).
+    /// \param[in]  calculatorA, calculatorB    names of the calculator tools to be used.
+    /// \param[in]  funcKD                      name of the method to be used for KD computation.
+    /// \param[out] kd                          computed KD value for discrimination of processes A and B.
+    /// \param[out] me2processA                 computed |ME|^2 for process A.
+    /// \param[out] me2processB                 computed |ME|^2 for process B.
+    /// \param[in]  syst                        controls whether PDF mean or width is adjusted to gauge the systematic effects (DEFAULT = kNone)
+    /// \return                                 error code of the computation: 0 = NO_ERR, 1 = ERR_PROCESS
+    ///
+    int computeKD(Processes processA, MEMCalcs calculatorA, Processes processB, MEMCalcs calculatorB, double (MEMs::*funcKD)(double, double, SuperKDsyst), double& kd, double& me2processA, double& me2processB, SuperKDsyst syst = MEMNames::kNone );
+
+    ///
     /// Retrieve the interference reweighting factor for the given event, computed using the JHUGen.
     ///
     /// Method should be called only after running computeMEs(vector<TLorentzVector> partP,vector<int> partId).
@@ -154,27 +171,17 @@ public:
     /// \return                                 interference reweighting factor for the given event.
     ///
     double getMELAWeight() { return m_weight;}
-    
-    //////////////////////////////////////////////////////////////////////////
-    ///----------------------------------------------------------------------------------------------
-    /// interface for calculating P(m4l) for superKD 
-    /// syst controls whether PDF mean or width is adjusted
-    /// to gauge systematic effects
-    /// process: should be either kSMHiggs or kqqZZ else ERR_PROCESS
-    /// partP: 4-momentum of leptons (with photons added)
-    /// partId: PDG Id of leptons
-    /// kNone: nominal shape is used
-    /// kScaleUp/kScaleDown: mean mass shifted up/down appropriate scale error
-    /// kResolUp/kResolDown: width is varied by appropriate resolution error
-    
-    /// sigProb: variable return with P(m4l) for signal
-    /// bkgProb: variable return with P(m4l) for background
-    ///----------------------------------------------------------------------------------------------
-    void computePm4l(vector<TLorentzVector> partP, 
-		     vector<int> partId,
-		     SuperKDsyst syst,
-		     double& sigProb,
-		     double& bkgProb);
+
+    ///
+    /// Interface for calculating the P(m4l) for SM signal and ZZ background (e.g. processes kSMHiggs and kqqZZ, respectively).
+    ///
+    /// \param[in]  partP                   the input vector with TLorentzVectors for 4 leptons.
+    /// \param[in]  partId                  the input vecor with IDs (PDG) for 4 leptons.
+    /// \param[in]  syst                    controls whether PDF mean or width is adjusted to gauge the systematic effects
+    /// \param[out] sigProb                 calculated P(m4l) for signal
+    /// \param[out] bkgProb                 calculated P(m4l) for background
+    ///
+    void computePm4l(vector<TLorentzVector> partP, vector<int> partId, SuperKDsyst syst, double& sigProb, double& bkgProb);
 
     /// Simple KD function: kd = log(me2processA / me2processB).
     double logRatio(double me2processA, double me2processB);
@@ -182,13 +189,11 @@ public:
     /// Case-dependent KD function of a general form: kd = me2processA / (me2processA + c * me2processB).
     double probRatio(Processes processA, MEMCalcs calculatorA, Processes processB, MEMCalcs calculatorB);
 
+    /// KD function with pdf(m4l) folded in, in a form: kd = Pm4lSig * me2sig / ( Pm4lSig * me2sig + Pm4lBkg * me2bkg ).
+    double PDFm4lRatio(double me2processA, double me2processB, SuperKDsyst syst);
+
     /// Matrix of supproted processes
     static const bool isProcSupported[NUM_PROCESSES][NUM_MEMCALCS];
-
-    /// mapping of process enums between MEMNames and MELA (defined in TVar.hh
-    map<Processes,TVar::Process> MELAprocMap;
-    map<Processes,TVar::Production> MELAprodMap;
-    map<MEMCalcs,TVar::MatrixElement> MELAcalcMap;
 
     /// enums for supported return values/errors
     enum ERRCodes    {NO_ERR, ERR_PROCESS, ERR_COMPUTE, NUM_ERRORS};
@@ -206,11 +211,16 @@ private:
 
     /// stored results of MEs computed with computeMEs(...)
     double m_computedME[NUM_PROCESSES][NUM_MEMCALCS];
+    /// stored results of P(m4l) computed with computePm4l(...)
+    double m_computedPm4lSig[NUM_SuperKDsyst];
+    double m_computedPm4lBkg[NUM_SuperKDsyst];
 
     ///Mike : Also add weights for interference in caching
     float m_weight;
 
-    
+    /// compute pdf(m4l) with computePm4l(...) for all systs
+    void computePm4ls(vector<TLorentzVector> partP, vector<int> partId);
+
     /// MELA calculation
     int cacheMELAcalculation(Processes process, MEMCalcs calculator,vector<TLorentzVector> partP, vector<int> partId,double& me2process);
 
@@ -220,6 +230,11 @@ private:
     // caches to avoid multiplemela computations
     std::vector<TLorentzVector> partPCache;
     std::vector<int> partIdCache;
+
+    /// mapping of process enums between MEMNames and MELA (defined in TVar.hh
+    map<Processes,TVar::Process> MELAprocMap;
+    map<Processes,TVar::Production> MELAprodMap;
+    map<MEMCalcs,TVar::MatrixElement> MELAcalcMap;
 };
 
 
