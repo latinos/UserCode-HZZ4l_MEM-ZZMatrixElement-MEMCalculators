@@ -408,10 +408,10 @@ int  MEMs::cacheMELAcalculation(Processes process, MEMCalcs calculator,vector<TL
 
   // protections against NaNs, return ERR_COMPUTE and skip ME calc
   if(TMath::IsNaN(costhetastar)||
-     TMath::IsNaN(costhetastar)||
-     TMath::IsNaN(costhetastar)||
-     TMath::IsNaN(costhetastar)||
-     TMath::IsNaN(costhetastar) ) return ERR_COMPUTE; 
+     TMath::IsNaN(costheta1)||
+     TMath::IsNaN(costheta2)||
+     TMath::IsNaN(phi)||
+     TMath::IsNaN(phi1) ) return ERR_COMPUTE; 
 
   float m1=(partP[0] + partP[1]).M();
   float m2=(partP[2] + partP[3]).M();
